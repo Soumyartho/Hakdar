@@ -111,7 +111,9 @@ button, input, select, textarea {
   height: 100vh;
   z-index: -2;
   pointer-events: none;
-  opacity: clamp(0.12, var(--scroll-progress, 1), 1);
+  /* Kept substantially present even at the top so the hero's masked lower edge dissolves into a
+     real gradient rather than into near-black (which read as a hard horizontal seam) */
+  opacity: clamp(0.5, var(--scroll-progress, 1), 1);
   transition: opacity 0.1s linear;
 }
 

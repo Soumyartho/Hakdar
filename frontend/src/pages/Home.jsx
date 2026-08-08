@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle, ShieldCheck, Activity, Users, Search, AlertCircle, Clock, FileText, Lock } from 'lucide-react';
 import './Home.css';
@@ -14,6 +14,41 @@ export default function Home() {
   });
   const [quickResults, setQuickResults] = useState(null);
   const [quickLoading, setQuickLoading] = useState(false);
+
+  // The hero has to start at the very top of the document so the navbar floats over it as
+  // translucent glass. Rather than adding up paddings/margins (offsetTop misreports for the
+  // sticky navbar), zero the pull and read the hero's own natural document offset - that is
+  // exactly how far it needs to move up, whatever the layout above it happens to be.
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+
+    const measure = () => {
+      const hero = document.querySelector('.hero-video-stage');
+      const navbar = document.querySelector('.navbar');
+      if (!hero || !navbar) return;
+
+      root.style.setProperty('--hero-pull', '0px');
+      const naturalTop = hero.getBoundingClientRect().top + window.scrollY;
+      root.style.setProperty('--hero-pull', `${naturalTop}px`);
+
+      // Drop the video below the navbar so the artwork's own Hindi headline is never buried
+      // under it. The blurred backdrop still covers this band, so the hero stays edge-to-edge.
+      const navMarginBottom = parseFloat(window.getComputedStyle(navbar).marginBottom || '0');
+      const inset = Math.max(0, Math.round(naturalTop - navMarginBottom + 18));
+      root.style.setProperty('--hero-media-inset', `${inset}px`);
+    };
+
+    measure();
+    // The navbar's height shifts by a couple of pixels when the display font swaps in, which
+    // would otherwise leave a thin sliver of background above the hero.
+    document.fonts?.ready.then(measure).catch(() => {});
+    window.addEventListener('resize', measure);
+    return () => {
+      window.removeEventListener('resize', measure);
+      root.style.removeProperty('--hero-pull');
+      root.style.removeProperty('--hero-media-inset');
+    };
+  }, []);
 
   const handleQuickEstimate = async (e) => {
     e.preventDefault();
@@ -37,48 +72,55 @@ export default function Home() {
 
   return (
     <div className="home-container">
-      {/* Full-bleed cinemagraph hero - pure imagery, no text on top of it, no glass framing */}
+      {/* Full-screen cinemagraph hero. The video is 16:9 and is shown complete (object-fit: contain)
+          so its own baked-in Hindi headline stays intact; a blurred copy of the same artwork fills
+          the side gaps so it still reads as edge-to-edge. Our copy sits in the lower half, clear of
+          that baked-in text. The media layer is masked at the bottom so it dissolves into the
+          shader gradient instead of ending on a hard horizontal cut. */}
       <section className="hero-video-stage">
-        <video
-          className="hero-video-stage-media"
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster="/images/sustainable_agriculture.jpg"
-        >
-          <source src="/Video/Animate_this_watercolor_illust.mp4" type="video/mp4" />
-        </video>
-        <div className="hero-media-scrim"></div>
+        <div className="hero-media-layer">
+          <div className="hero-video-backdrop" aria-hidden="true"></div>
+          <video
+            className="hero-video-stage-media"
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster="/images/sustainable_agriculture.jpg"
+          >
+            <source src="/Video/Animate_this_watercolor_illust.mp4" type="video/mp4" />
+          </video>
+          <div className="hero-media-scrim"></div>
+        </div>
+
+        <div className="hero-copy">
+          <div className="badge-featured">
+            <span className="live-dot"></span> Sovereign Citizen Welfare &amp; Redressal Network
+          </div>
+
+          <h1 className="hero-title">
+            RIGHTFUL WELFARE SCHEME ACCESS <br />
+            &amp; <span className="gradient-text">TRANSPARENT GRIEVANCE REDRESSAL</span>
+          </h1>
+
+          <p className="hero-tagline">
+            Bridging the gap between government welfare benefits and the citizens who need them—with zero corruption, voice-assisted eligibility matching, and SLA-enforced municipal accountability.
+          </p>
+
+          <div className="hero-buttons">
+            <Link to="/schemes" className="btn btn-primary">
+              <span>Find Eligible Schemes</span> <ArrowRight size={18} />
+            </Link>
+            <Link to="/grievance/file" className="btn btn-secondary">
+              <span>Report Anonymous Grievance</span>
+            </Link>
+            <Link to="/grievance/track" className="btn btn-secondary">
+              <span>Track SLA Status</span>
+            </Link>
+          </div>
+        </div>
+
         <div className="hero-scroll-cue" aria-hidden="true"></div>
-      </section>
-
-      {/* Headline sits below the image, directly on the tricolor gradient - not boxed, not overlapping the imagery */}
-      <section className="hero-headline-section" data-reveal>
-        <div className="badge-featured">
-          <span className="live-dot"></span> Sovereign Citizen Welfare &amp; Redressal Network
-        </div>
-
-        <h1 className="hero-title">
-          RIGHTFUL WELFARE SCHEME ACCESS <br />
-          &amp; <span className="gradient-text">TRANSPARENT GRIEVANCE REDRESSAL</span>
-        </h1>
-
-        <p className="hero-tagline">
-          Bridging the gap between government welfare benefits and the citizens who need them—with zero corruption, voice-assisted eligibility matching, and SLA-enforced municipal accountability.
-        </p>
-
-        <div className="hero-buttons">
-          <Link to="/schemes" className="btn btn-primary">
-            <span>Find Eligible Schemes</span> <ArrowRight size={18} />
-          </Link>
-          <Link to="/grievance/file" className="btn btn-secondary">
-            <span>Report Anonymous Grievance</span>
-          </Link>
-          <Link to="/grievance/track" className="btn btn-secondary">
-            <span>Track SLA Status</span>
-          </Link>
-        </div>
       </section>
 
       {/* Official Governance Trust Band */}
@@ -287,9 +329,7 @@ export default function Home() {
 
           <div className="pillar-card glass-panel">
             <div className="pillar-image-container">
-              <video className="pillar-graphic" autoPlay muted loop playsInline poster="/images/green_energy.jpg">
-                <source src="/Video/Animate_this_watercolor_illust-2.mp4" type="video/mp4" />
-              </video>
+              <img src="/images/green_energy.jpg" alt="Anonymous Reporting" className="pillar-graphic" />
             </div>
             <div className="pillar-text-content">
               <h3 className="pillar-title">Geotagged Anonymous Grievance</h3>
@@ -345,15 +385,37 @@ export default function Home() {
 
           <div className="beneficiary-card glass-panel">
             <div className="beneficiary-image-container">
-              <video className="beneficiary-graphic" autoPlay muted loop playsInline poster="/images/transparent_redressal.jpg">
-                <source src="/Video/Animate_this_watercolor_illust-3.mp4" type="video/mp4" />
-              </video>
+              <img src="/images/transparent_redressal.jpg" alt="Municipal Governance Bodies" className="beneficiary-graphic" />
             </div>
             <div className="beneficiary-text-content">
               <h4>Municipal Governance Bodies</h4>
               <p>Visual analytics heatmaps and real-time category distribution bars for data-driven resolution.</p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Closing full-bleed cinemagraph - masked top and bottom so it melts in and out of the gradient */}
+      <section className="closing-cinemagraph">
+        <div className="closing-cinemagraph-media">
+          <video
+            className="closing-cinemagraph-video"
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster="/images/green_energy.jpg"
+          >
+            <source src="/Video/Animate_this_watercolor_illust-2.mp4" type="video/mp4" />
+          </video>
+          <div className="closing-cinemagraph-scrim"></div>
+        </div>
+
+        <div className="closing-cinemagraph-copy">
+          <h2 className="section-title">Welfare That Reaches Every Village</h2>
+          <p className="section-subtitle">
+            From the last mile to the district headquarters—entitlements delivered, grievances answered, accountability enforced.
+          </p>
         </div>
       </section>
     </div>
