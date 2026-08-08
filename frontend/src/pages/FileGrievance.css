@@ -1,0 +1,234 @@
+.file-grievance-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.text-area {
+  resize: vertical;
+}
+
+.error-banner {
+  background-color: rgba(239, 68, 68, 0.15);
+  border: 1px solid #ef4444;
+  color: #f87171;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.grievance-form {
+  align-items: start;
+}
+
+.form-fields, .form-map-panel {
+  padding: 2rem;
+  background: rgba(17, 20, 36, 0.7) !important;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  height: 100%;
+}
+
+.form-fields h3, .map-header h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.map-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.map-header h3 {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.gps-btn {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+/* File Upload input */
+.file-upload-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+  cursor: pointer;
+  border: 2px dashed var(--border-color);
+  transition: var(--transition-fast);
+}
+
+.file-upload-wrapper:hover {
+  border-color: var(--accent-color);
+  background: var(--bg-card-hover);
+}
+
+.hidden-file-input {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.file-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.file-selected-name {
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+.readonly-input {
+  background-color: rgba(25, 30, 56, 0.2);
+  color: var(--text-muted);
+}
+
+.map-widget-wrapper {
+  height: 250px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.submit-grievance-btn {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+/* Success box styling */
+.file-grievance-success {
+  max-width: 600px;
+  margin: 3rem auto;
+  padding: 3rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  background: rgba(17, 20, 36, 0.85) !important;
+}
+
+.success-icon {
+  color: #10b981;
+}
+
+.anon-warning {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  background-color: rgba(25, 30, 56, 0.4);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.tracking-code-box {
+  background: var(--bg-input);
+  padding: 1.25rem 2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tracking-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.tracking-id-value {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.tracking-id-value code {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  font-family: monospace;
+}
+
+.copy-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
+}
+
+.copy-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255,255,255,0.05);
+}
+
+.sla-alert {
+  display: flex;
+  align-items: start;
+  gap: 1rem;
+  padding: 1rem;
+  width: 100%;
+  background: rgba(245, 158, 11, 0.05) !important;
+  border-color: rgba(245, 158, 11, 0.2) !important;
+  text-align: left;
+}
+
+.sla-alert svg {
+  color: #f59e0b;
+  flex-shrink: 0;
+}
+
+.sla-alert h5 {
+  color: #f59e0b;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.sla-alert p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.success-actions {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.success-actions a, .success-actions button {
+  flex: 1;
+}
+
+@media (max-width: 480px) {
+  .success-actions {
+    flex-direction: column;
+  }
+}

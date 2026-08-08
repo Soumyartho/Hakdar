@@ -1,0 +1,18 @@
+.footer {
+  text-align: center;
+  padding: 1.5rem;
+  margin-top: auto;
+  border-radius: var(--radius-md) !important;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  background: rgba(17, 20, 36, 0.7) !important;
+  border-bottom: none;
+  border-left: none;
+  border-right: none;
+}
+
+.footer-subtext {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
