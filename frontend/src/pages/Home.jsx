@@ -1,188 +1,290 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, CheckCircle, ShieldCheck, Activity, Users, MapPin, Award, Clock } from 'lucide-react';
+import { ArrowRight, CheckCircle, ShieldCheck, Activity, Users, Search, AlertCircle, Clock, FileText, Lock } from 'lucide-react';
 import './Home.css';
+import { api } from '../services/api';
 
 export default function Home() {
+  // Quick eligibility estimator state on home page
+  const [quickProfile, setQuickProfile] = useState({
+    age: '25',
+    gender: 'female',
+    income: '120000',
+    occupation: 'farmer'
+  });
+  const [quickResults, setQuickResults] = useState(null);
+  const [quickLoading, setQuickLoading] = useState(false);
+
+  const handleQuickEstimate = async (e) => {
+    e.preventDefault();
+    setQuickLoading(true);
+    try {
+      const res = await api.post('/schemes/match', {
+        age: parseInt(quickProfile.age),
+        gender: quickProfile.gender,
+        income: parseFloat(quickProfile.income),
+        occupation: quickProfile.occupation
+      });
+      if (res.success) {
+        setQuickResults(res.data.filter(s => s.eligibility.isEligible));
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setQuickLoading(false);
+    }
+  };
+
   return (
     <div className="home-container">
-      {/* Hero Section */}
+      {/* Refactored Hero Section - No Side Modal */}
       <section className="hero-section glass-panel">
-        <div className="hero-text">
+        <div className="hero-content-centered">
           <div className="badge-featured">
-            <span className="live-dot"></span> Sovereign Welfare &amp; Redressal Network
+            <span className="live-dot"></span> Sovereign Citizen Welfare &amp; Redressal Network
           </div>
           
           <h1 className="hero-title">
-            Your Access to Welfare <br />
-            &amp; <span className="gradient-text">Transparent Grievance Redressal</span>
+            RIGHTFUL WELFARE SCHEME ACCESS <br />
+            &amp; <span className="gradient-text">TRANSPARENT GRIEVANCE REDRESSAL</span>
           </h1>
           
-          <p className="hero-description">
-            Hakdar empowers eligible citizens to discover government benefits through profile-based matching while providing a safe, anonymous channel to report local civic and safety issues with automated SLA escalation.
+          {/* Smooth Tagline */}
+          <p className="hero-tagline">
+            Bridging the gap between government welfare benefits and the citizens who need them—with zero corruption, voice-assisted eligibility matching, and SLA-enforced municipal accountability.
           </p>
           
           <div className="hero-buttons">
             <Link to="/schemes" className="btn btn-primary">
-              <span>Check Eligibility</span> <ArrowRight size={18} />
+              <span>Find Eligible Schemes</span> <ArrowRight size={18} />
             </Link>
             <Link to="/grievance/file" className="btn btn-secondary">
-              <span>Report Grievance</span>
+              <span>Report Anonymous Grievance</span>
             </Link>
             <Link to="/grievance/track" className="btn btn-secondary">
-              <span>Track Status</span>
+              <span>Track SLA Status</span>
             </Link>
           </div>
         </div>
+      </section>
 
-        {/* Live System Preview Card */}
-        <div className="hero-preview-widget glass-panel">
-          <div className="preview-header">
-            <h4>Live SLA Monitoring Console</h4>
-            <span className="live-badge">ACTIVE</span>
+      {/* Official Governance Trust Band */}
+      <section className="trust-band glass-panel">
+        <div className="trust-item">
+          <Lock size={20} className="trust-icon" />
+          <div>
+            <h5>100% Anonymous</h5>
+            <p>Encrypted reporting without identity link</p>
           </div>
-          
-          <div className="preview-items">
-            <div className="preview-item">
-              <div className="status-indicator success"></div>
-              <div>
-                <h5>PM-KISAN Scheme</h5>
-                <p>Direct cash transfer seeded for 12,400+ farmers</p>
-              </div>
-            </div>
+        </div>
+        <div className="trust-divider"></div>
+        <div className="trust-item">
+          <Clock size={20} className="trust-icon" />
+          <div>
+            <h5>Automated SLA Escalation</h5>
+            <p>Auto-escalates unaddressed civic issues</p>
+          </div>
+        </div>
+        <div className="trust-divider"></div>
+        <div className="trust-item">
+          <ShieldCheck size={20} className="trust-icon" />
+          <div>
+            <h5>DBT &amp; Govt Verified</h5>
+            <p>Direct Benefit Transfer compliance</p>
+          </div>
+        </div>
+      </section>
 
-            <div className="preview-item">
-              <div className="status-indicator warning"></div>
-              <div>
-                <h5>Water Supply Pipeline Leak</h5>
-                <p>Auto-escalated to Sub-Divisional Officer (Level 1)</p>
-              </div>
-            </div>
+      {/* Pushed Down Live SLA Monitoring Console Showcase */}
+      <section className="live-console-showcase glass-panel">
+        <div className="section-header">
+          <h2 className="section-title">Live Municipal SLA Monitor</h2>
+          <p className="section-subtitle">Real-time public tracking console ensuring municipal authorities respond within strict time limits.</p>
+        </div>
 
-            <div className="preview-item">
-              <div className="status-indicator info"></div>
-              <div>
-                <h5>Ladli Behna Assistance</h5>
-                <p>Monthly stipend matched for verified applicants</p>
-              </div>
+        <div className="console-items-grid">
+          <div className="console-card">
+            <div className="console-card-header">
+              <span className="status-dot success"></span>
+              <span className="ticket-id">HAK-2026-X11</span>
+              <span className="status-tag status-submitted">Under Local Review</span>
+            </div>
+            <h4>Broken Water Pipeline Leaking</h4>
+            <p>Sector 4 Community Hall area water main pipeline rupture reported anonymously.</p>
+            <div className="console-card-footer">
+              <span>Assigned: Water Supply Dept</span>
+              <span className="timer-text">SLA: 1m 45s left</span>
+            </div>
+          </div>
+
+          <div className="console-card">
+            <div className="console-card-header">
+              <span className="status-dot danger"></span>
+              <span className="ticket-id">HAK-2026-Z33</span>
+              <span className="status-tag status-escalated">Escalated to Level 1 (SDO)</span>
+            </div>
+            <h4>Non-Functioning Streetlights</h4>
+            <p>Bypass road stretch light outages creating safety hazard for women at night.</p>
+            <div className="console-card-footer">
+              <span>Escalated: Sub-Divisional Officer</span>
+              <span className="timer-text alert">OVERDUE - AUTO-ESCALATED</span>
+            </div>
+          </div>
+
+          <div className="console-card">
+            <div className="console-card-header">
+              <span className="status-dot resolved"></span>
+              <span className="ticket-id">HAK-2026-W44</span>
+              <span className="status-tag status-resolved">Case Resolved</span>
+            </div>
+            <h4>Open Manhole Near School</h4>
+            <p>Sanitation crew dispatched, cover replaced and sealed properly.</p>
+            <div className="console-card-footer">
+              <span>Resolved by Ward Sanitation</span>
+              <span className="timer-text success-text">Closed in 45 mins</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Live System Stats Ticker */}
-      <section className="stats-ticker glass-panel">
-        <div className="ticker-item">
-          <h4>₹24.8 Cr+</h4>
-          <p>Welfare Disbursed</p>
+      {/* Interactive Quick Scheme Estimator Component */}
+      <section className="quick-estimator-section glass-panel grid-2">
+        <div className="estimator-info">
+          <h2 className="section-title">Instant Eligibility Calculator</h2>
+          <p className="section-subtitle">Test your profile parameters right now to see how many government welfare schemes you qualify for.</p>
+
+          <form onSubmit={handleQuickEstimate} className="quick-form">
+            <div className="grid-2">
+              <div className="form-group">
+                <label className="form-label">Age</label>
+                <input 
+                  type="number" 
+                  value={quickProfile.age} 
+                  onChange={(e) => setQuickProfile({ ...quickProfile, age: e.target.value })} 
+                  className="form-input"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Gender</label>
+                <select 
+                  value={quickProfile.gender} 
+                  onChange={(e) => setQuickProfile({ ...quickProfile, gender: e.target.value })} 
+                  className="form-input"
+                >
+                  <option value="female">Female</option>
+                  <option value="male">Male</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid-2">
+              <div className="form-group">
+                <label className="form-label">Annual Income (₹)</label>
+                <input 
+                  type="number" 
+                  value={quickProfile.income} 
+                  onChange={(e) => setQuickProfile({ ...quickProfile, income: e.target.value })} 
+                  className="form-input"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Occupation</label>
+                <select 
+                  value={quickProfile.occupation} 
+                  onChange={(e) => setQuickProfile({ ...quickProfile, occupation: e.target.value })} 
+                  className="form-input"
+                >
+                  <option value="farmer">Farmer</option>
+                  <option value="informal">Informal Worker</option>
+                  <option value="other">Corporate / Other</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" className="btn btn-primary" disabled={quickLoading}>
+              {quickLoading ? 'Matching Database...' : 'Calculate Eligible Schemes'}
+            </button>
+          </form>
         </div>
-        <div className="ticker-divider"></div>
-        <div className="ticker-item">
-          <h4>94.2%</h4>
-          <p>SLA Resolution Rate</p>
-        </div>
-        <div className="ticker-divider"></div>
-        <div className="ticker-item">
-          <h4>2 Minutes</h4>
-          <p>Demo SLA Escalation Interval</p>
-        </div>
-        <div className="ticker-divider"></div>
-        <div className="ticker-item">
-          <h4>100%</h4>
-          <p>Anonymous Reporting Safety</p>
+
+        <div className="estimator-results-box">
+          <h4>Matched Scheme Results</h4>
+          {quickResults === null ? (
+            <div className="empty-results-placeholder">
+              <Search size={36} />
+              <p>Click "Calculate Eligible Schemes" to run instant matching against seeded national database.</p>
+            </div>
+          ) : quickResults.length === 0 ? (
+            <div className="no-matches">
+              <AlertCircle size={32} />
+              <p>No schemes matched for these specific criteria. Try checking the full Schemes page.</p>
+            </div>
+          ) : (
+            <div className="results-list">
+              {quickResults.map(s => (
+                <div key={s.id} className="quick-result-card">
+                  <div className="result-header">
+                    <span className="scheme-dept">{s.department}</span>
+                    <span className="eligible-badge">Eligible</span>
+                  </div>
+                  <h5>{s.title}</h5>
+                  <p>{s.benefits}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
-      {/* Structured Core Pillars (NO AI Icon Containers) */}
+      {/* Core Platform Capabilities Grid */}
       <section className="pillars-section">
         <div className="section-header">
-          <h2 className="section-title">Core Platform Capabilities</h2>
-          <p className="section-subtitle">Engineered to eliminate administrative hurdles and bring public accountability to local governance.</p>
+          <h2 className="section-title">Core Platform Architecture</h2>
+          <p className="section-subtitle">Designed to eliminate administrative complexity and enforce SLA accountability.</p>
         </div>
 
         <div className="pillars-grid">
           <div className="pillar-card glass-panel">
             <h3 className="pillar-title">Rule-Based Eligibility Engine</h3>
             <p className="pillar-description">
-              Instantly matches citizen parameters (age, gender, income, occupation) against hundreds of scheme criteria, explaining exactly why you qualify.
+              Evaluates citizen parameters (income, age, gender, occupation) against rule logic to detail why you qualify and exact documents required.
             </p>
-            <Link to="/schemes" className="pillar-link">Run Profile Matcher &rarr;</Link>
+            <Link to="/schemes" className="pillar-link">Run Full Scheme Search &rarr;</Link>
           </div>
 
           <div className="pillar-card glass-panel">
             <h3 className="pillar-title">Multilingual Voice Assistant</h3>
             <p className="pillar-description">
-              Integrated browser voice synthesis and speech recognition allowing low-literacy citizens to converse in native dialects to find benefits.
+              Browser-native speech synthesis and voice recognition allowing low-literacy users to speak queries directly in native dialects.
             </p>
-
-            <span className="pillar-badge">Voice Enabled</span>
+            <span className="pillar-badge">Speech Enabled</span>
           </div>
 
           <div className="pillar-card glass-panel">
-            <h3 className="pillar-title">Anonymous Geotagged Reporting</h3>
+            <h3 className="pillar-title">Geotagged Anonymous Grievance</h3>
             <p className="pillar-description">
-              Report civic failures, sanitation hazards, or corruption without revealing identity. Includes GPS coordinates and photo/video upload evidence.
+              File sanitation, safety, or corruption reports anonymously. Includes GPS coordinates capture and media evidence attachments.
             </p>
-            <Link to="/grievance/file" className="pillar-link">File Anonymous Report &rarr;</Link>
+            <Link to="/grievance/file" className="pillar-link">Submit Anonymous Report &rarr;</Link>
           </div>
 
           <div className="pillar-card glass-panel">
             <h3 className="pillar-title">SLA Auto-Escalation Engine</h3>
             <p className="pillar-description">
-              Transparent deadline tracking. Complaints unaddressed by local officers are automatically escalated to Sub-Divisional and District Heads.
+              Transparent deadline tracking. Unresolved grievances are automatically escalated to Sub-Divisional Officers and District Heads.
             </p>
             <Link to="/grievance/track" className="pillar-link">Track Complaint SLA &rarr;</Link>
           </div>
         </div>
       </section>
 
-      {/* How Hakdar Works - 4 Step Pipeline */}
-      <section className="workflow-section glass-panel">
-        <div className="section-header">
-          <h2 className="section-title">How Hakdar Works</h2>
-          <p className="section-subtitle">A transparent 4-step pipeline for citizens and municipal authorities.</p>
-        </div>
-
-        <div className="workflow-steps grid-2">
-          <div className="workflow-step">
-            <div className="step-number">01</div>
-            <div>
-              <h4>Input Profile Credentials</h4>
-              <p>Citizens enter basic criteria (income, occupation, age) or speak to the voice assistant.</p>
-            </div>
-          </div>
-
-          <div className="workflow-step">
-            <div className="step-number">02</div>
-            <div>
-              <h4>Instant Scheme Matching</h4>
-              <p>The system evaluates rules and details required documents, benefits, and application steps.</p>
-            </div>
-          </div>
-
-          <div className="workflow-step">
-            <div className="step-number">03</div>
-            <div>
-              <h4>Submit Anonymous Grievance</h4>
-              <p>Citizens log safety or civic issues with media evidence and GPS location without login.</p>
-            </div>
-          </div>
-
-          <div className="workflow-step">
-            <div className="step-number">04</div>
-            <div>
-              <h4>Track SLA Auto-Escalation</h4>
-              <p>If unresolved within SLA limits, the platform automatically escalates the issue to senior officials.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Target Beneficiaries & Impact Groups */}
+      {/* Target Beneficiaries */}
       <section className="beneficiaries-section">
         <div className="section-header">
           <h2 className="section-title">Target Beneficiaries</h2>
-          <p className="section-subtitle">Designed to serve vulnerable populations and empower local municipal bodies.</p>
+          <p className="section-subtitle">Built to empower marginalized citizens and streamline municipal administration.</p>
         </div>
 
         <div className="beneficiaries-grid">

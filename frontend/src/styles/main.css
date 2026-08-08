@@ -100,7 +100,7 @@ button, input, select, textarea {
   pointer-events: none;
 }
 
-/* Bright crystal clear backdrop mask */
+/* Subtle background darkening for background motion shader */
 .shader-background-wrapper::after {
   content: '';
   position: absolute;
@@ -108,7 +108,7 @@ button, input, select, textarea {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(10, 14, 26, 0.12);
+  background: rgba(8, 12, 22, 0.15);
   pointer-events: none;
 }
 
@@ -117,29 +117,29 @@ button, input, select, textarea {
   width: 100%;
   max-width: 1240px;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: 1rem 1.5rem 3rem 1.5rem;
 }
 
-/* Pure Frosted Glassmorphism Containers */
+/* Pure Frosted Glassmorphism Containers with High Contrast Slate Background */
 .glass-panel {
-  background: var(--bg-card);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--border-color);
+  background: rgba(10, 14, 26, 0.85) !important;
+  backdrop-filter: blur(28px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4) !important;
   transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.35s ease, box-shadow 0.35s ease;
 }
 
 .glass-panel:hover {
-  transform: translateY(-5px) scale(1.015);
-  border-color: var(--border-color-hover);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+  transform: translateY(-4px) scale(1.01);
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5) !important;
 }
 
-/* Header Gradient Text (Warm Saffron / Sovereign Gold) */
+/* High Contrast Header Text */
 .gradient-text {
-  background: var(--grad-primary);
+  background: linear-gradient(135deg, #ffb74d 0%, #ff9800 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -151,7 +151,7 @@ button, input, select, textarea {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.8rem 1.6rem;
+  padding: 0.85rem 1.75rem;
   border-radius: var(--radius-md);
   font-weight: 700;
   cursor: pointer;
@@ -161,27 +161,27 @@ button, input, select, textarea {
 }
 
 .btn-primary {
-  background: var(--grad-primary);
+  background: linear-gradient(135deg, #f57c00 0%, #ff9800 100%);
   color: #ffffff;
-  box-shadow: 0 4px 16px rgba(230, 81, 0, 0.35);
+  box-shadow: 0 4px 18px rgba(245, 124, 0, 0.4);
 }
 
 .btn-primary:hover {
-  background: var(--grad-primary-hover);
+  background: linear-gradient(135deg, #e65100 0%, #f57c00 100%);
   transform: translateY(-2px);
-  box-shadow: 0 6px 22px rgba(230, 81, 0, 0.5);
+  box-shadow: 0 6px 24px rgba(245, 124, 0, 0.6);
 }
 
 .btn-secondary {
-  background: rgba(15, 23, 42, 0.65);
-  color: var(--text-primary);
+  background: rgba(15, 23, 42, 0.75);
+  color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(10px);
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.5);
   transform: translateY(-2px);
 }
 
@@ -217,7 +217,7 @@ button, input, select, textarea {
 
 .form-input {
   width: 100%;
-  padding: 0.8rem 1.1rem;
+  padding: 0.85rem 1.15rem;
   background-color: var(--bg-input);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
@@ -228,7 +228,7 @@ button, input, select, textarea {
 
 .form-input:focus {
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(245, 124, 0, 0.25);
+  box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.25);
 }
 
 /* Leaflet Map Styling Override */
