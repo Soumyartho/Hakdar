@@ -13,6 +13,7 @@ export default function Chatbot() {
   ]);
   const [inputText, setInputText] = useState('');
   const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const [isSpeakingEnabled, setIsSpeakingEnabled] = useState(true);
   
   const recognitionRef = useRef(null);
@@ -32,7 +33,10 @@ export default function Chatbot() {
       rec.lang = 'en-IN'; // Indian English, supports Hindi-English phrases
       rec.interimResults = false;
 
-      rec.onstart = () => setIsListening(true);
+      rec.onstart = () => {
+        setIsListening(true);
+        setIsSpeaking(false);
+      };
       rec.onend = () => setIsListening(false);
       rec.onerror = (e) => {
         console.error('Speech recognition error:', e.error);
@@ -55,6 +59,14 @@ export default function Chatbot() {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-IN';
+
+    utterance.onstart = () => {
+      setIsSpeaking(true);
+      setIsListening(false);
+    };
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+
     window.speechSynthesis.speak(utterance);
   };
 
@@ -67,6 +79,7 @@ export default function Chatbot() {
       recognitionRef.current.stop();
     } else {
       window.speechSynthesis.cancel(); // Stop talking when user wants to speak
+      setIsSpeaking(false);
       recognitionRef.current.start();
     }
   };
@@ -140,10 +153,7 @@ export default function Chatbot() {
     setMessages(prev => [...prev, { sender: 'user', text: textToSend }]);
 
     try {
-      // Parser heuristics
       const profile = parseProfileFromText(textToSend);
-      
-      // Call backend to match schemes
       const response = await api.post('/schemes/match', profile);
 
       if (response.success) {
@@ -151,19 +161,18 @@ export default function Chatbot() {
         
         let reply = '';
         if (eligibleSchemes.length === 0) {
-          reply = `Based on what you said (Age: ${profile.age}, Gender: ${profile.gender}, Occupation: ${profile.occupation}, Income: ₹${profile.income.toLocaleString()}), I couldn't find any direct schemes. Please check the "Find Schemes" tab for a full list and adjustment.`;
+          reply = `Based on your profile, I couldn't find direct matching welfare schemes. Please inspect the schemes database.`;
         } else {
           const names = eligibleSchemes.map(s => s.title).join(', and ');
-          reply = `Good news! Based on your profile (Age: ${profile.age}, Gender: ${profile.gender}, Occupation: ${profile.occupation}, Income: ₹${profile.income.toLocaleString()}), you might be eligible for ${eligibleSchemes.length} scheme(s): ${names}. You can apply through our Portal.`;
+          reply = `I found matching benefits for you: ${names}. Open details to view required documents.`;
         }
 
-        // Add bot message
         setMessages(prev => [...prev, { sender: 'bot', text: reply }]);
         speakText(reply);
       }
     } catch (error) {
       console.error(error);
-      const errMsg = "I encountered an issue matching schemes. Please type clearly or use the Find Schemes page directly.";
+      const errMsg = "I failed to verify eligibility rules. Please check your query details.";
       setMessages(prev => [...prev, { sender: 'bot', text: errMsg }]);
       speakText(errMsg);
     }
@@ -215,6 +224,21 @@ export default function Chatbot() {
             ))}
             <div ref={chatEndRef} />
           </div>
+
+          {/* Animated procedural frequency waveform bar */}
+          {(isListening || isSpeaking) && (
+            <div className={`chatbot-waveform-bar ${isListening ? 'listening' : 'speaking'}`}>
+              <div className="wave-lines-container">
+                <div className="wave-line wave-1"></div>
+                <div className="wave-line wave-2"></div>
+                <div className="wave-line wave-3"></div>
+                <div className="wave-line wave-4"></div>
+              </div>
+              <span className="waveform-status-text">
+                {isListening ? 'Listening...' : 'Speaking...'}
+              </span>
+            </div>
+          )}
 
           <div className="chatbot-input-panel">
             <button 

@@ -30,6 +30,10 @@
   font-display: swap;
 }
 
+:root {
+  --scroll-progress: 1;
+}
+
 h1, h2, h3, h4, h5, h6, .gradient-text, .logo-text, .page-header, .hero-title {
   font-family: var(--font-heading);
   letter-spacing: 0.04em;
@@ -98,6 +102,8 @@ button, input, select, textarea {
   height: 100vh;
   z-index: -2;
   pointer-events: none;
+  opacity: clamp(0.12, var(--scroll-progress, 1), 1);
+  transition: opacity 0.1s linear;
 }
 
 /* Subtle background darkening for background motion shader */
@@ -120,29 +126,47 @@ button, input, select, textarea {
   padding: 1rem 1.5rem 3rem 1.5rem;
 }
 
-/* Pure Frosted Glassmorphism Containers with High Contrast Slate Background */
+/* True Frosted Glassmorphism (iOS-style translucent hovering glass) */
 .glass-panel {
-  background: rgba(10, 14, 26, 0.85) !important;
-  backdrop-filter: blur(28px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  position: relative;
+  background: var(--glass-tint-strong) !important;
+  backdrop-filter: blur(24px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.24) !important;
   border-radius: var(--radius-lg);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4) !important;
-  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18) !important;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease, box-shadow 0.4s ease;
+  overflow: hidden;
+}
+
+.glass-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
 }
 
 .glass-panel:hover {
-  transform: translateY(-4px) scale(1.01);
-  border-color: rgba(255, 255, 255, 0.45) !important;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5) !important;
+  transform: translateY(-6px) scale(1.012);
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  box-shadow:
+    0 18px 46px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18) !important;
 }
 
-/* High Contrast Header Text */
+/* High Contrast Header Text - safe against the live tricolor gradient */
 .gradient-text {
   background: linear-gradient(135deg, #ffb74d 0%, #ff9800 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
 }
 
 /* Buttons */

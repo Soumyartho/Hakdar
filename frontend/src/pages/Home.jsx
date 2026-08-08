@@ -37,23 +37,37 @@ export default function Home() {
 
   return (
     <div className="home-container">
-      {/* Refactored Hero Section - No Side Modal */}
-      <section className="hero-section glass-panel">
+      {/* Cinemagraph Hero Section - full-bleed media that crossfades into the tricolor gradient on scroll */}
+      <section className="hero-section hero-cinemagraph glass-panel">
+        <div className="hero-media">
+          <video
+            className="hero-media-video"
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster="/images/sustainable_agriculture.jpg"
+          >
+            <source src="/videos/hero-cinemagraph.mp4" type="video/mp4" />
+          </video>
+          <div className="hero-media-scrim"></div>
+        </div>
+
         <div className="hero-content-centered">
           <div className="badge-featured">
             <span className="live-dot"></span> Sovereign Citizen Welfare &amp; Redressal Network
           </div>
-          
+
           <h1 className="hero-title">
             RIGHTFUL WELFARE SCHEME ACCESS <br />
             &amp; <span className="gradient-text">TRANSPARENT GRIEVANCE REDRESSAL</span>
           </h1>
-          
+
           {/* Smooth Tagline */}
           <p className="hero-tagline">
             Bridging the gap between government welfare benefits and the citizens who need them—with zero corruption, voice-assisted eligibility matching, and SLA-enforced municipal accountability.
           </p>
-          
+
           <div className="hero-buttons">
             <Link to="/schemes" className="btn btn-primary">
               <span>Find Eligible Schemes</span> <ArrowRight size={18} />
@@ -238,7 +252,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Core Platform Capabilities Grid */}
+      {/* Core Platform Capabilities Grid - Styled with Bespoke Watercolor Graphics */}
       <section className="pillars-section">
         <div className="section-header">
           <h2 className="section-title">Core Platform Architecture</h2>
@@ -247,40 +261,60 @@ export default function Home() {
 
         <div className="pillars-grid">
           <div className="pillar-card glass-panel">
-            <h3 className="pillar-title">Rule-Based Eligibility Engine</h3>
-            <p className="pillar-description">
-              Evaluates citizen parameters (income, age, gender, occupation) against rule logic to detail why you qualify and exact documents required.
-            </p>
-            <Link to="/schemes" className="pillar-link">Run Full Scheme Search &rarr;</Link>
+            <div className="pillar-image-container">
+              <img src="/images/digital_access.jpg" alt="Rule-Based Eligibility" className="pillar-graphic" />
+            </div>
+            <div className="pillar-text-content">
+              <h3 className="pillar-title">Rule-Based Eligibility Engine</h3>
+              <p className="pillar-description">
+                Evaluates citizen parameters (income, age, gender, occupation) against rule logic to detail why you qualify and exact documents required.
+              </p>
+              <Link to="/schemes" className="pillar-link">Run Full Scheme Search &rarr;</Link>
+            </div>
           </div>
 
           <div className="pillar-card glass-panel">
-            <h3 className="pillar-title">Multilingual Voice Assistant</h3>
-            <p className="pillar-description">
-              Browser-native speech synthesis and voice recognition allowing low-literacy users to speak queries directly in native dialects.
-            </p>
-            <span className="pillar-badge">Speech Enabled</span>
+            <div className="pillar-image-container">
+              <img src="/images/education_empowerment.jpg" alt="Voice Assistant" className="pillar-graphic" />
+            </div>
+            <div className="pillar-text-content">
+              <h3 className="pillar-title">Multilingual Voice Assistant</h3>
+              <p className="pillar-description">
+                Browser-native speech synthesis and voice recognition allowing low-literacy users to speak queries directly in native dialects.
+              </p>
+              <span className="pillar-badge">Speech Enabled</span>
+            </div>
           </div>
 
           <div className="pillar-card glass-panel">
-            <h3 className="pillar-title">Geotagged Anonymous Grievance</h3>
-            <p className="pillar-description">
-              File sanitation, safety, or corruption reports anonymously. Includes GPS coordinates capture and media evidence attachments.
-            </p>
-            <Link to="/grievance/file" className="pillar-link">Submit Anonymous Report &rarr;</Link>
+            <div className="pillar-image-container">
+              <img src="/images/green_energy.jpg" alt="Anonymous Reporting" className="pillar-graphic" />
+            </div>
+            <div className="pillar-text-content">
+              <h3 className="pillar-title">Geotagged Anonymous Grievance</h3>
+              <p className="pillar-description">
+                File sanitation, safety, or corruption reports anonymously. Includes GPS coordinates capture and media evidence attachments.
+              </p>
+              <Link to="/grievance/file" className="pillar-link">Submit Anonymous Report &rarr;</Link>
+            </div>
           </div>
 
           <div className="pillar-card glass-panel">
-            <h3 className="pillar-title">SLA Auto-Escalation Engine</h3>
-            <p className="pillar-description">
-              Transparent deadline tracking. Unresolved grievances are automatically escalated to Sub-Divisional Officers and District Heads.
-            </p>
-            <Link to="/grievance/track" className="pillar-link">Track Complaint SLA &rarr;</Link>
+            <div className="pillar-image-container">
+              <img src="/images/skill_development.jpg" alt="SLA Redressal" className="pillar-graphic" />
+            </div>
+            <div className="pillar-text-content">
+              <h3 className="pillar-title">SLA Auto-Escalation Engine</h3>
+              <p className="pillar-description">
+                Transparent deadline tracking. Unresolved grievances are automatically escalated to Sub-Divisional Officers and District Heads.
+              </p>
+              <Link to="/grievance/track" className="pillar-link">Track Complaint SLA &rarr;</Link>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Target Beneficiaries */}
+      {/* Target Beneficiaries - Styled with Watercolor Card Headers */}
       <section className="beneficiaries-section">
         <div className="section-header">
           <h2 className="section-title">Target Beneficiaries</h2>
@@ -289,18 +323,33 @@ export default function Home() {
 
         <div className="beneficiaries-grid">
           <div className="beneficiary-card glass-panel">
-            <h4>Underserved Citizens &amp; Farmers</h4>
-            <p>Access direct cash transfers, seed subsidies, and healthcare cover without middlemen or bribery.</p>
+            <div className="beneficiary-image-container">
+              <img src="/images/safe_housing.jpg" alt="Underserved Citizens & Farmers" className="beneficiary-graphic" />
+            </div>
+            <div className="beneficiary-text-content">
+              <h4>Underserved Citizens &amp; Farmers</h4>
+              <p>Access direct cash transfers, seed subsidies, and healthcare cover without middlemen or bribery.</p>
+            </div>
           </div>
 
           <div className="beneficiary-card glass-panel">
-            <h4>Women &amp; Vulnerable Groups</h4>
-            <p>Safe anonymous reporting for harassment, sanitation, and safety issues with guaranteed officer review.</p>
+            <div className="beneficiary-image-container">
+              <img src="/images/women_empowerment.jpg" alt="Women & Vulnerable Groups" className="beneficiary-graphic" />
+            </div>
+            <div className="beneficiary-text-content">
+              <h4>Women &amp; Vulnerable Groups</h4>
+              <p>Safe anonymous reporting for harassment, sanitation, and safety issues with guaranteed officer review.</p>
+            </div>
           </div>
 
           <div className="beneficiary-card glass-panel">
-            <h4>Municipal Governance Bodies</h4>
-            <p>Visual analytics heatmaps and real-time category distribution bars for data-driven resolution.</p>
+            <div className="beneficiary-image-container">
+              <img src="/images/transparent_redressal.jpg" alt="Municipal Governance Bodies" className="beneficiary-graphic" />
+            </div>
+            <div className="beneficiary-text-content">
+              <h4>Municipal Governance Bodies</h4>
+              <p>Visual analytics heatmaps and real-time category distribution bars for data-driven resolution.</p>
+            </div>
           </div>
         </div>
       </section>
