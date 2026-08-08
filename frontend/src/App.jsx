@@ -1,11 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import React, { useState, useRef } from 'react';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { Canvas } from '@react-three/fiber';
 import GrainyGradient from './components/GrainyGradient';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Chatbot from './components/Chatbot';
-import LiquidCursor from './components/LiquidCursor';
+import ScrollExperience from './scroll/ScrollExperience';
 import Home from './pages/Home';
 import Schemes from './pages/Schemes';
 import FileGrievance from './pages/FileGrievance';
@@ -13,50 +13,6 @@ import TrackGrievance from './pages/TrackGrievance';
 import AdminDashboard from './pages/AdminDashboard';
 import './styles/variables.css';
 import './styles/main.css';
-
-// Drives --scroll-progress on the root element from the hero section's height.
-// Written directly to the DOM (no React state) so it stays cheap on every scroll tick.
-function ScrollGradientDriver() {
-  const location = useLocation();
-
-  useEffect(() => {
-    let rafId = null;
-    let pending = false;
-
-    const measureAndSet = () => {
-      pending = false;
-      const heroEl = document.querySelector('.hero-cinemagraph');
-      const root = document.documentElement;
-
-      if (!heroEl) {
-        root.style.setProperty('--scroll-progress', '1');
-        return;
-      }
-
-      const heroHeight = heroEl.offsetHeight || window.innerHeight;
-      const progress = Math.min(window.scrollY / (heroHeight * 0.85), 1);
-      root.style.setProperty('--scroll-progress', String(Math.max(0, progress)));
-    };
-
-    const onScrollOrResize = () => {
-      if (pending) return;
-      pending = true;
-      rafId = requestAnimationFrame(measureAndSet);
-    };
-
-    measureAndSet();
-    window.addEventListener('scroll', onScrollOrResize, { passive: true });
-    window.addEventListener('resize', onScrollOrResize);
-
-    return () => {
-      window.removeEventListener('scroll', onScrollOrResize);
-      window.removeEventListener('resize', onScrollOrResize);
-      if (rafId) cancelAnimationFrame(rafId);
-    };
-  }, [location.pathname]);
-
-  return null;
-}
 
 export default function App() {
   const [ripples, setRipples] = useState([]);
@@ -118,11 +74,8 @@ export default function App() {
         {/* Floating Voice Chatbot Assistant */}
         <Chatbot />
 
-        {/* Cursor-following liquid-glass distortion lens */}
-        <LiquidCursor />
-
-        {/* Drives the tricolor gradient's scroll-linked opacity (writes --scroll-progress) */}
-        <ScrollGradientDriver />
+        {/* Lenis smooth-scroll + GSAP ScrollTrigger reveals + shader scroll-progress */}
+        <ScrollExperience />
       </div>
     </Router>
   );

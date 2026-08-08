@@ -37,53 +37,52 @@ export default function Home() {
 
   return (
     <div className="home-container">
-      {/* Cinemagraph Hero Section - full-bleed media that crossfades into the tricolor gradient on scroll */}
-      <section className="hero-section hero-cinemagraph glass-panel">
-        <div className="hero-media">
-          <video
-            className="hero-media-video"
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster="/images/sustainable_agriculture.jpg"
-          >
-            <source src="/videos/hero-cinemagraph.mp4" type="video/mp4" />
-          </video>
-          <div className="hero-media-scrim"></div>
+      {/* Full-bleed cinemagraph hero - pure imagery, no text on top of it, no glass framing */}
+      <section className="hero-video-stage">
+        <video
+          className="hero-video-stage-media"
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="/images/sustainable_agriculture.jpg"
+        >
+          <source src="/Video/Animate_this_watercolor_illust.mp4" type="video/mp4" />
+        </video>
+        <div className="hero-media-scrim"></div>
+        <div className="hero-scroll-cue" aria-hidden="true"></div>
+      </section>
+
+      {/* Headline sits below the image, directly on the tricolor gradient - not boxed, not overlapping the imagery */}
+      <section className="hero-headline-section" data-reveal>
+        <div className="badge-featured">
+          <span className="live-dot"></span> Sovereign Citizen Welfare &amp; Redressal Network
         </div>
 
-        <div className="hero-content-centered">
-          <div className="badge-featured">
-            <span className="live-dot"></span> Sovereign Citizen Welfare &amp; Redressal Network
-          </div>
+        <h1 className="hero-title">
+          RIGHTFUL WELFARE SCHEME ACCESS <br />
+          &amp; <span className="gradient-text">TRANSPARENT GRIEVANCE REDRESSAL</span>
+        </h1>
 
-          <h1 className="hero-title">
-            RIGHTFUL WELFARE SCHEME ACCESS <br />
-            &amp; <span className="gradient-text">TRANSPARENT GRIEVANCE REDRESSAL</span>
-          </h1>
+        <p className="hero-tagline">
+          Bridging the gap between government welfare benefits and the citizens who need them—with zero corruption, voice-assisted eligibility matching, and SLA-enforced municipal accountability.
+        </p>
 
-          {/* Smooth Tagline */}
-          <p className="hero-tagline">
-            Bridging the gap between government welfare benefits and the citizens who need them—with zero corruption, voice-assisted eligibility matching, and SLA-enforced municipal accountability.
-          </p>
-
-          <div className="hero-buttons">
-            <Link to="/schemes" className="btn btn-primary">
-              <span>Find Eligible Schemes</span> <ArrowRight size={18} />
-            </Link>
-            <Link to="/grievance/file" className="btn btn-secondary">
-              <span>Report Anonymous Grievance</span>
-            </Link>
-            <Link to="/grievance/track" className="btn btn-secondary">
-              <span>Track SLA Status</span>
-            </Link>
-          </div>
+        <div className="hero-buttons">
+          <Link to="/schemes" className="btn btn-primary">
+            <span>Find Eligible Schemes</span> <ArrowRight size={18} />
+          </Link>
+          <Link to="/grievance/file" className="btn btn-secondary">
+            <span>Report Anonymous Grievance</span>
+          </Link>
+          <Link to="/grievance/track" className="btn btn-secondary">
+            <span>Track SLA Status</span>
+          </Link>
         </div>
       </section>
 
       {/* Official Governance Trust Band */}
-      <section className="trust-band glass-panel">
+      <section className="trust-band glass-panel" data-reveal>
         <div className="trust-item">
           <Lock size={20} className="trust-icon" />
           <div>
@@ -110,7 +109,7 @@ export default function Home() {
       </section>
 
       {/* Pushed Down Live SLA Monitoring Console Showcase */}
-      <section className="live-console-showcase glass-panel">
+      <section className="live-console-showcase glass-panel" data-reveal>
         <div className="section-header">
           <h2 className="section-title">Live Municipal SLA Monitor</h2>
           <p className="section-subtitle">Real-time public tracking console ensuring municipal authorities respond within strict time limits.</p>
@@ -162,7 +161,7 @@ export default function Home() {
       </section>
 
       {/* Interactive Quick Scheme Estimator Component */}
-      <section className="quick-estimator-section glass-panel grid-2">
+      <section className="quick-estimator-section glass-panel grid-2" data-reveal>
         <div className="estimator-info">
           <h2 className="section-title">Instant Eligibility Calculator</h2>
           <p className="section-subtitle">Test your profile parameters right now to see how many government welfare schemes you qualify for.</p>
@@ -253,7 +252,7 @@ export default function Home() {
       </section>
 
       {/* Core Platform Capabilities Grid - Styled with Bespoke Watercolor Graphics */}
-      <section className="pillars-section">
+      <section className="pillars-section" data-reveal>
         <div className="section-header">
           <h2 className="section-title">Core Platform Architecture</h2>
           <p className="section-subtitle">Designed to eliminate administrative complexity and enforce SLA accountability.</p>
@@ -288,7 +287,9 @@ export default function Home() {
 
           <div className="pillar-card glass-panel">
             <div className="pillar-image-container">
-              <img src="/images/green_energy.jpg" alt="Anonymous Reporting" className="pillar-graphic" />
+              <video className="pillar-graphic" autoPlay muted loop playsInline poster="/images/green_energy.jpg">
+                <source src="/Video/Animate_this_watercolor_illust-2.mp4" type="video/mp4" />
+              </video>
             </div>
             <div className="pillar-text-content">
               <h3 className="pillar-title">Geotagged Anonymous Grievance</h3>
@@ -315,7 +316,7 @@ export default function Home() {
       </section>
 
       {/* Target Beneficiaries - Styled with Watercolor Card Headers */}
-      <section className="beneficiaries-section">
+      <section className="beneficiaries-section" data-reveal>
         <div className="section-header">
           <h2 className="section-title">Target Beneficiaries</h2>
           <p className="section-subtitle">Built to empower marginalized citizens and streamline municipal administration.</p>
@@ -344,7 +345,9 @@ export default function Home() {
 
           <div className="beneficiary-card glass-panel">
             <div className="beneficiary-image-container">
-              <img src="/images/transparent_redressal.jpg" alt="Municipal Governance Bodies" className="beneficiary-graphic" />
+              <video className="beneficiary-graphic" autoPlay muted loop playsInline poster="/images/transparent_redressal.jpg">
+                <source src="/Video/Animate_this_watercolor_illust-3.mp4" type="video/mp4" />
+              </video>
             </div>
             <div className="beneficiary-text-content">
               <h4>Municipal Governance Bodies</h4>

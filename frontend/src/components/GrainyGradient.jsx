@@ -18,18 +18,19 @@ const GrainyGradient = forwardRef(({ ripples = [], mousePos = { x: 0.5, y: 0.5 }
       iTime: { value: 0.0 },
       iResolution: { value: new THREE.Vector3() },
       uMouse: { value: new THREE.Vector2(0, 0) },
-      // Simplex noise uniforms
-      noiseIntensity: { value: 1.55 },
-      noiseScale: { value: 2.0 },
-      noiseSpeed: { value: 0.15 },
+      // Simplex noise uniforms - lower scale + slower speed reads as thick, viscous liquid
+      // rather than thin turbulent ripples
+      noiseIntensity: { value: 1.2 },
+      noiseScale: { value: 1.1 },
+      noiseSpeed: { value: 0.09 },
       // Wave/domain warping noise uniforms
-      waveNoiseIntensity: { value: 1.2 },
-      waveNoiseScale1: { value: 0.5 },
-      waveNoiseScale2: { value: 0.8 },
-      waveNoiseScale3: { value: 1.2 },
-      waveNoiseSpeed1: { value: 0.24 },
-      waveNoiseSpeed2: { value: 0.2 },
-      waveNoiseSpeed3: { value: 0.3 },
+      waveNoiseIntensity: { value: 1.35 },
+      waveNoiseScale1: { value: 0.32 },
+      waveNoiseScale2: { value: 0.5 },
+      waveNoiseScale3: { value: 0.75 },
+      waveNoiseSpeed1: { value: 0.14 },
+      waveNoiseSpeed2: { value: 0.12 },
+      waveNoiseSpeed3: { value: 0.18 },
       // Ripple uniforms
       ripplePositions: { value: [] },
       rippleTimes: { value: [] },
@@ -250,9 +251,10 @@ const fragmentShader = `
     float n3 = noise(p * waveNoiseScale2 + vec2(iTime * -waveNoiseSpeed3, iTime * waveNoiseSpeed3)) * 0.5;
     float n4 = noise(p * waveNoiseScale3 + vec2(iTime * waveNoiseSpeed3, -iTime * waveNoiseSpeed3)) * 0.3;
 
-    // Interactive mouse distortion force
+    // Interactive mouse distortion force - this IS the pointer effect (no DOM cursor overlay),
+    // so it needs a wide reach and real punch to read as intentional
     float distToMouse = distance(p, uMouse);
-    float mouseForce = smoothstep(0.6, 0.0, distToMouse) * 0.25;
+    float mouseForce = smoothstep(0.95, 0.0, distToMouse) * 0.5;
     vec2 mouseOffset = vec2(sin(distToMouse * 8.0 - iTime * 2.0), cos(distToMouse * 8.0 - iTime * 2.0)) * mouseForce;
     
     return p + vec2(n1 + n3, n2 + n4) * waveNoiseIntensity + mouseOffset;
@@ -315,25 +317,22 @@ const fragmentShader = `
     return vec3(r / 255.0, g / 255.0, b / 255.0);
   }
 
-  // Multi-color gradient function (BRIGHT INDIAN TRICOLOR)
+  // Multi-color gradient function - deep saffron / thick cream / deep forest,
+  // tuned to echo the watercolor illustrations' own muted palette rather than a bright neon tricolor
   vec3 multiColorGradient(float t) {
-    vec3 colors[3];
-    colors[0] = hexToRgb(255.0, 153.0, 51.0);  // Bright Saffron Orange (#FF9933)
-    colors[1] = hexToRgb(255.0, 255.0, 255.0); // Pure Vivid White (#FFFFFF)
-    colors[2] = hexToRgb(19.0, 136.0, 8.0);    // Bright India Green (#138808)
-    
+    vec3 saffron = hexToRgb(214.0, 120.0, 40.0);
+    vec3 cream = hexToRgb(238.0, 230.0, 212.0);
+    vec3 forest = hexToRgb(22.0, 94.0, 26.0);
+
     t = clamp(t, 0.0, 1.0);
-    
-    float scaledT = t * 2.0; 
-    int index = int(floor(scaledT));
-    float localT = fract(scaledT);
-    
-    if (index >= 2) {
-      return colors[2];
+
+    if (t < 0.32) {
+      return mix(saffron, cream, smoothstep(0.0, 0.32, t));
+    } else if (t < 0.68) {
+      return cream;
+    } else {
+      return mix(cream, forest, smoothstep(0.68, 1.0, t));
     }
-    
-    float smoothT = smoothstep(0.0, 1.0, localT);
-    return mix(colors[index], colors[index + 1], smoothT);
   }
 
   // Apply grain to color
@@ -397,7 +396,10 @@ const fragmentShader = `
     
     // Ripple brightness tweak
     color += vec3(ripples * 0.2);
-    
+
+    // Deepen toward the app's dark navy base for a moodier, more immersive liquid feel
+    color = mix(color, vec3(0.03, 0.05, 0.09), 0.14);
+
     // Apply grain effect
     O = vec4(applyGrain(color, vUv), 1.0);
   }
