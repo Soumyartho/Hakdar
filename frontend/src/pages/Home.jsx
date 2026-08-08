@@ -79,7 +79,6 @@ export default function Home() {
           shader gradient instead of ending on a hard horizontal cut. */}
       <section className="hero-video-stage">
         <div className="hero-media-layer">
-          <div className="hero-video-backdrop" aria-hidden="true"></div>
           <video
             className="hero-video-stage-media"
             autoPlay

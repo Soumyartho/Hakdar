@@ -4,17 +4,35 @@
   align-items: center;
   padding: 1.1rem 2.2rem;
   margin-bottom: 2.2rem;
-  border-radius: var(--radius-lg) !important;
-  background: var(--glass-tint-float) !important;
-  backdrop-filter: blur(32px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
-  box-shadow:
-    0 12px 40px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.34) !important;
   position: sticky;
   top: 1.5rem;
   z-index: 100;
+}
+
+/* Compound selector on purpose: the element carries both .navbar and .glass-panel, and main.css
+   is loaded after this file - a plain .navbar rule loses the tie-break and gets silently
+   overridden by .glass-panel, !important or not. */
+.navbar.glass-panel {
+  border-radius: var(--radius-lg) !important;
+  background: var(--glass-tint-float) !important;
+  /* saturate() above ~120% makes the bar take on the colour of whatever is behind it - over the
+     hero's orange sky that turned it into an orange slab rather than glass. Held near neutral
+     and dimmed slightly instead, which is what reads as frosted glass. */
+  backdrop-filter: blur(30px) saturate(115%) brightness(0.7) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(115%) brightness(0.7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.26) !important;
+  box-shadow:
+    0 6px 24px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+/* A sticky nav bar should not lift and scale like a content card */
+.navbar.glass-panel:hover {
+  transform: none;
+  border-color: rgba(255, 255, 255, 0.34) !important;
+  box-shadow:
+    0 6px 24px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
 }
 
 .navbar-logo a {
