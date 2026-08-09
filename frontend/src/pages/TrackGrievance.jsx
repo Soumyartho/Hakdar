@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { api } from '../services/api';
+import { api, API_ROOT } from '../services/api';
 import { Search, Calendar, FileText, CheckCircle, ShieldAlert, Clock, AlertTriangle, Play } from 'lucide-react';
 import './TrackGrievance.css';
 
@@ -153,13 +153,13 @@ export default function TrackGrievance() {
                 <h4>Media Evidence Attached</h4>
                 {grievance.attachment_path.endsWith('.mp4') || grievance.attachment_path.endsWith('.mov') ? (
                   <video 
-                    src={`http://localhost:5000/${grievance.attachment_path}`} 
+                    src={`${API_ROOT}/${grievance.attachment_path}`} 
                     controls 
                     className="attachment-media"
                   />
                 ) : (
                   <img 
-                    src={`http://localhost:5000/${grievance.attachment_path}`} 
+                    src={`${API_ROOT}/${grievance.attachment_path}`} 
                     alt="Evidence file" 
                     className="attachment-media" 
                   />

@@ -1,4 +1,7 @@
-const API_BASE = 'http://localhost:5000/api';
+// Exported so pages that link directly to uploaded media (attachments, evidence photos) build
+// that URL from the same source instead of each hardcoding their own copy of the backend origin.
+export const API_ROOT = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE = `${API_ROOT}/api`;
 
 const handleResponse = async (res) => {
   const data = await res.json();

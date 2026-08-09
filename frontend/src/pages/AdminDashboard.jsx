@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { api } from '../services/api';
+import { api, API_ROOT } from '../services/api';
 import MapWidget from '../components/MapWidget';
 import { ShieldCheck, LogOut, CheckSquare, MessageSquare, AlertCircle, FileText, ChevronRight, Eye, RefreshCw, HelpCircle } from 'lucide-react';
 import './AdminDashboard.css';
@@ -341,7 +341,7 @@ export default function AdminDashboard() {
               {selectedGrievance.attachment_path && (
                 <div className="media-preview">
                   <a 
-                    href={`http://localhost:5000/${selectedGrievance.attachment_path}`} 
+                    href={`${API_ROOT}/${selectedGrievance.attachment_path}`} 
                     target="_blank" 
                     rel="noreferrer" 
                     className="view-media-link"
