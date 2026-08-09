@@ -34,15 +34,28 @@
   height: 490px;
   display: flex;
   flex-direction: column;
-  background: var(--glass-tint-nav) !important;
-  backdrop-filter: blur(26px) saturate(190%) !important;
-  -webkit-backdrop-filter: blur(26px) saturate(190%) !important;
-  border-radius: var(--radius-lg) !important;
   overflow: hidden;
-  box-shadow:
-    0 16px 40px rgba(0, 0, 0, 0.6),
-    inset 0 1px 0 rgba(255, 255, 255, 0.28) !important;
-  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+}
+
+/* Compound selector: .glass-panel is defined in main.css which loads after this file, so a plain
+   .chatbot-window rule loses the specificity tie and gets overridden. */
+.chatbot-window.glass-panel {
+  background: var(--glass-tint-nav) !important;
+  backdrop-filter: var(--glass-blur-panel) !important;
+  -webkit-backdrop-filter: var(--glass-blur-panel) !important;
+  border-radius: var(--radius-lg) !important;
+  border: 1px solid var(--glass-edge) !important;
+  box-shadow: var(--glass-shadow) !important;
+}
+
+/* A docked chat window should not lift, scale or glint on hover */
+.chatbot-window.glass-panel:hover {
+  transform: none;
+  box-shadow: var(--glass-shadow) !important;
+}
+
+.chatbot-window.glass-panel:hover::after {
+  animation: none;
 }
 
 @media (max-width: 480px) {
@@ -57,8 +70,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.25rem;
-  background: rgba(15, 23, 42, 0.95);
-  border-bottom: 1px solid var(--border-color);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(7, 11, 22, 0.25) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
 }
 
 .chatbot-title {
@@ -139,9 +152,11 @@
 }
 
 .bot .message-bubble {
-  background: rgba(255, 255, 255, 0.1);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.06) 100%);
+  backdrop-filter: blur(10px) saturate(160%);
+  -webkit-backdrop-filter: blur(10px) saturate(160%);
   color: var(--text-primary);
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-top-left-radius: 0;
 }
 
@@ -155,8 +170,8 @@
   display: flex;
   align-items: center;
   padding: 0.75rem;
-  background: rgba(15, 23, 42, 0.95);
-  border-top: 1px solid var(--border-color);
+  background: linear-gradient(180deg, rgba(7, 11, 22, 0.2) 0%, rgba(7, 11, 22, 0.34) 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
   gap: 0.5rem;
 }
 
@@ -208,8 +223,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.6rem 1rem;
-  background: rgba(10, 14, 26, 0.95);
-  border-top: 1px solid var(--border-color);
+  background: rgba(7, 11, 22, 0.3);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   gap: 1rem;
 }
 

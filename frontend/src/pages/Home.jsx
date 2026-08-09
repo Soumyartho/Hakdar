@@ -24,18 +24,11 @@ export default function Home() {
 
     const measure = () => {
       const hero = document.querySelector('.hero-video-stage');
-      const navbar = document.querySelector('.navbar');
-      if (!hero || !navbar) return;
+      if (!hero) return;
 
       root.style.setProperty('--hero-pull', '0px');
       const naturalTop = hero.getBoundingClientRect().top + window.scrollY;
       root.style.setProperty('--hero-pull', `${naturalTop}px`);
-
-      // Drop the video below the navbar so the artwork's own Hindi headline is never buried
-      // under it. The blurred backdrop still covers this band, so the hero stays edge-to-edge.
-      const navMarginBottom = parseFloat(window.getComputedStyle(navbar).marginBottom || '0');
-      const inset = Math.max(0, Math.round(naturalTop - navMarginBottom + 18));
-      root.style.setProperty('--hero-media-inset', `${inset}px`);
     };
 
     measure();

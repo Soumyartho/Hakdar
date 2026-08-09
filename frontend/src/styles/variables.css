@@ -38,16 +38,61 @@
   --shadow-lg: 0 16px 48px 0 rgba(0, 0, 0, 0.5);
   --glass-blur: blur(24px) saturate(180%);
 
-  /* True Glassmorphism Surface Tokens (iOS-style frosted glass) */
-  --glass-tint-strong: linear-gradient(160deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.03) 35%, rgba(12, 16, 28, 0.62) 100%);
-  --glass-tint-soft: linear-gradient(160deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 35%, rgba(12, 16, 28, 0.42) 100%);
-  --glass-tint-nav: linear-gradient(160deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.02) 30%, rgba(10, 14, 26, 0.72) 100%);
-  /* For chrome that floats directly over artwork (the navbar over the hero cinemagraph). The dark
-     stop is kept NEUTRAL and fairly even so the glass reads as frosted, not as a tinted bar that
-     takes on whatever colour happens to be behind it. */
-  --glass-tint-float: linear-gradient(160deg, rgba(255, 255, 255, 0.14) 0%, rgba(18, 24, 36, 0.5) 42%, rgba(12, 16, 26, 0.66) 100%);
+  /* ── Liquid Glass surfaces ───────────────────────────────────────────────────────────────
+     The muddy look of flat dark overlays comes from draining the colour out of whatever sits
+     behind them. These tints stay deep enough at the bottom for white body copy while opening
+     up at the top, and the blur specs push saturation ABOVE 100% so the tricolour behind still
+     reads as vivid colour through the glass rather than as grey sludge. */
+  /* Two stacked layers rather than one ramp: a directional white sheen on top of a near-uniform
+     dark base. The single ramp went light at the top-left, which is exactly where card headings
+     sit - so they lost contrast whenever a pale part of the gradient drifted behind them. The
+     flat base guarantees a contrast floor everywhere while the sheen still sells the glass. */
+  --glass-tint-strong:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.17) 0%, rgba(255, 255, 255, 0.05) 26%, rgba(255, 255, 255, 0) 56%),
+    linear-gradient(180deg, rgba(7, 11, 22, 0.46) 0%, rgba(7, 11, 22, 0.6) 100%);
+  --glass-tint-soft:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.04) 28%, rgba(255, 255, 255, 0) 58%),
+    linear-gradient(180deg, rgba(7, 11, 22, 0.3) 0%, rgba(7, 11, 22, 0.42) 100%);
+  --glass-tint-nav: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.05) 30%,
+    rgba(8, 12, 22, 0.55) 100%
+  );
+  /* Chrome floating directly over artwork (navbar over the hero cinemagraph). Deliberately the
+     thinnest tint of the set - the cinemagraph's motion has to stay legible through it. */
+  --glass-tint-float: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.16) 0%,
+    rgba(255, 255, 255, 0.06) 34%,
+    rgba(8, 12, 22, 0.36) 100%
+  );
+
+  --glass-blur-panel: blur(30px) saturate(195%) contrast(104%);
+  --glass-blur-inner: blur(20px) saturate(180%);
+  /* saturate() is deliberately BELOW 100% here. The bar sits on the hero's bright orange sky; at
+     or above 100% it picks that colour up and reads as an orange slab. Pulling saturation down
+     turns the backdrop neutral while luminance still varies, so the cinemagraph's motion stays
+     visible through the glass without tinting it. */
+  --glass-blur-float: blur(16px) saturate(42%) brightness(0.6);
+
+  --glass-edge: rgba(255, 255, 255, 0.26);
+  --glass-edge-hover: rgba(255, 255, 255, 0.46);
   --glass-highlight: rgba(255, 255, 255, 0.4);
   --glass-highlight-soft: rgba(255, 255, 255, 0.12);
+
+  /* Layered lift: a wide soft pool plus a tight contact shadow reads as a pane hovering above
+     the page, which is what sells glass more than the blur itself does. */
+  --glass-shadow:
+    0 24px 64px -16px rgba(0, 0, 0, 0.6),
+    0 6px 18px -6px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.07);
+  --glass-shadow-hover:
+    0 34px 80px -18px rgba(0, 0, 0, 0.66),
+    0 10px 26px -8px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.09);
 
   /* Layout and Sizing */
   --radius-sm: 8px;

@@ -13,26 +13,37 @@
    is loaded after this file - a plain .navbar rule loses the tie-break and gets silently
    overridden by .glass-panel, !important or not. */
 .navbar.glass-panel {
+  /* Restated here because .glass-panel sets position:relative and, on equal specificity, wins the
+     source-order tie against the .navbar rule above - which would silently kill the sticky nav. */
+  position: sticky;
+  top: 1.5rem;
+  z-index: 100;
   border-radius: var(--radius-lg) !important;
   background: var(--glass-tint-float) !important;
-  /* saturate() above ~120% makes the bar take on the colour of whatever is behind it - over the
-     hero's orange sky that turned it into an orange slab rather than glass. Held near neutral
-     and dimmed slightly instead, which is what reads as frosted glass. */
-  backdrop-filter: blur(30px) saturate(115%) brightness(0.7) !important;
-  -webkit-backdrop-filter: blur(30px) saturate(115%) brightness(0.7) !important;
-  border: 1px solid rgba(255, 255, 255, 0.26) !important;
+  /* Deliberately the lightest blur on the site. The bar sits directly on the hero cinemagraph
+     and the artwork's motion has to keep playing through it - heavy blur would freeze it into a
+     flat plate, and saturate() much above this would let it take on the sky's orange. */
+  backdrop-filter: var(--glass-blur-float) !important;
+  -webkit-backdrop-filter: var(--glass-blur-float) !important;
+  border: 1px solid rgba(255, 255, 255, 0.24) !important;
   box-shadow:
-    0 6px 24px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+    0 10px 34px -10px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.06) !important;
 }
 
-/* A sticky nav bar should not lift and scale like a content card */
+/* A sticky nav bar should not lift, scale or glint like a content card */
 .navbar.glass-panel:hover {
   transform: none;
   border-color: rgba(255, 255, 255, 0.34) !important;
   box-shadow:
-    0 6px 24px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+    0 10px 34px -10px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+.navbar.glass-panel:hover::after {
+  animation: none;
 }
 
 .navbar-logo a {

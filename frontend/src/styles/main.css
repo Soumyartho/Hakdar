@@ -137,38 +137,84 @@ button, input, select, textarea {
   padding: 1rem 1.5rem 3rem 1.5rem;
 }
 
-/* True Frosted Glassmorphism (iOS-style translucent hovering glass) */
+/* ── Liquid Glass panel ─────────────────────────────────────────────────────────────────────
+   Three stacked cues do the work: a high-saturation blur so the colour behind stays alive, a
+   directional tint that opens at the top-left and deepens toward the bottom-right, and a bright
+   1px inner top edge that reads as light catching the lip of the pane. */
 .glass-panel {
   position: relative;
+  isolation: isolate;
   background: var(--glass-tint-strong) !important;
-  backdrop-filter: blur(24px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.24) !important;
+  backdrop-filter: var(--glass-blur-panel) !important;
+  -webkit-backdrop-filter: var(--glass-blur-panel) !important;
+  border: 1px solid var(--glass-edge) !important;
   border-radius: var(--radius-lg);
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.18) !important;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease, box-shadow 0.4s ease;
+  box-shadow: var(--glass-shadow) !important;
+  transition:
+    transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.45s ease,
+    box-shadow 0.55s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
 }
 
+/* Specular sheen - a soft off-axis pool of light in the upper-left, the way a real pane picks up
+   a highlight. Sits under the content via z-index so it never washes out text. */
 .glass-panel::before {
   content: '';
   position: absolute;
   inset: 0;
-  height: 50%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+  z-index: -1;
+  background:
+    radial-gradient(120% 90% at 8% -10%, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.06) 38%, rgba(255, 255, 255, 0) 68%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 42%);
   pointer-events: none;
 }
 
+/* Slow diagonal glint that drifts across the pane on hover - the "fluid" part of the look */
+.glass-panel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 45%;
+  height: 100%;
+  z-index: -1;
+  background: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.14) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-14deg);
+  opacity: 0;
+  pointer-events: none;
+  transition: none;
+}
+
+.glass-panel:hover::after {
+  animation: glass-glint 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes glass-glint {
+  0% { left: -60%; opacity: 0; }
+  35% { opacity: 1; }
+  100% { left: 115%; opacity: 0; }
+}
+
 .glass-panel:hover {
-  transform: translateY(-6px) scale(1.012);
-  border-color: rgba(255, 255, 255, 0.5) !important;
-  box-shadow:
-    0 18px 46px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.45),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.18) !important;
+  transform: translateY(-6px) scale(1.008);
+  border-color: var(--glass-edge-hover) !important;
+  box-shadow: var(--glass-shadow-hover) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-panel,
+  .glass-panel:hover {
+    transform: none;
+  }
+  .glass-panel:hover::after {
+    animation: none;
+  }
 }
 
 /* High Contrast Header Text - safe against the live tricolor gradient */
@@ -208,18 +254,23 @@ button, input, select, textarea {
 }
 
 .btn-secondary {
-  background: var(--glass-tint-nav);
+  background: var(--glass-tint-soft);
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  border: 1px solid var(--glass-edge);
+  backdrop-filter: var(--glass-blur-inner);
+  -webkit-backdrop-filter: var(--glass-blur-inner);
+  box-shadow:
+    0 8px 24px -8px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42);
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.18);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.1) 45%, rgba(7, 11, 22, 0.28) 100%);
+  border-color: var(--glass-edge-hover);
   transform: translateY(-2px);
+  box-shadow:
+    0 12px 30px -8px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 .btn-danger {
@@ -252,20 +303,40 @@ button, input, select, textarea {
   font-size: 0.9rem;
 }
 
+/* Inputs are recessed glass rather than solid slabs - inset shadow instead of a lift, so they
+   read as carved into the pane rather than floating on it */
 .form-input {
   width: 100%;
   padding: 0.85rem 1.15rem;
-  background-color: var(--bg-input);
-  border: 1px solid var(--border-color);
+  background: linear-gradient(145deg, rgba(5, 8, 16, 0.5) 0%, rgba(5, 8, 16, 0.34) 100%);
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: var(--radius-md);
   outline: none;
   color: #ffffff;
-  transition: var(--transition-fast);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.32),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.09);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.form-input::placeholder {
+  color: rgba(226, 232, 240, 0.55);
 }
 
 .form-input:focus {
-  border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.25);
+  border-color: rgba(255, 152, 0, 0.75);
+  background: linear-gradient(145deg, rgba(5, 8, 16, 0.56) 0%, rgba(5, 8, 16, 0.4) 100%);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.32),
+    0 0 0 3px rgba(255, 152, 0, 0.22);
+}
+
+/* Native dropdown lists cannot inherit the glass, so keep their popup readable */
+.form-input option {
+  background-color: #0d1524;
+  color: #ffffff;
 }
 
 /* Leaflet Map Styling Override */

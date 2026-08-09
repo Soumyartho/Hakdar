@@ -320,9 +320,13 @@ const fragmentShader = `
   // Multi-color gradient function - deep saffron / thick cream / deep forest,
   // tuned to echo the watercolor illustrations' own muted palette rather than a bright neon tricolor
   vec3 multiColorGradient(float t) {
-    vec3 saffron = hexToRgb(214.0, 120.0, 40.0);
-    vec3 cream = hexToRgb(238.0, 230.0, 212.0);
-    vec3 forest = hexToRgb(22.0, 94.0, 26.0);
+    // The middle band used to run near-white, which left white body copy sitting on glass panels
+    // with almost no contrast wherever that band drifted behind them. Pulled down to a muted warm
+    // stone: still unmistakably the tricolour's centre, but it keeps the whole surface in a range
+    // light text can survive on - and reads thicker and moodier besides.
+    vec3 saffron = hexToRgb(186.0, 100.0, 32.0);
+    vec3 cream = hexToRgb(171.0, 160.0, 141.0);
+    vec3 forest = hexToRgb(18.0, 78.0, 24.0);
 
     t = clamp(t, 0.0, 1.0);
 
@@ -398,7 +402,7 @@ const fragmentShader = `
     color += vec3(ripples * 0.2);
 
     // Deepen toward the app's dark navy base for a moodier, more immersive liquid feel
-    color = mix(color, vec3(0.03, 0.05, 0.09), 0.14);
+    color = mix(color, vec3(0.03, 0.05, 0.09), 0.24);
 
     // Apply grain effect
     O = vec4(applyGrain(color, vUv), 1.0);

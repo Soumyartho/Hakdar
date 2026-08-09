@@ -10,7 +10,6 @@
   max-width: 450px;
   margin: 5rem auto;
   padding: 3rem 2rem;
-  background: rgba(17, 20, 36, 0.8) !important;
   text-align: center;
 }
 
@@ -79,7 +78,6 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.25rem 2rem;
-  background: rgba(17, 20, 36, 0.7) !important;
 }
 
 .officer-profile {
@@ -136,7 +134,6 @@
 
 .stat-card {
   padding: 1.5rem;
-  background: rgba(25, 30, 56, 0.35) !important;
 }
 
 .stat-card .card-label {
@@ -164,7 +161,6 @@
 /* Map & Chart Split section */
 .dashboard-map-card, .dashboard-charts-card {
   padding: 2rem;
-  background: rgba(17, 20, 36, 0.6) !important;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -234,7 +230,6 @@
 
 .complaints-list-card, .complaints-action-card {
   padding: 2rem;
-  background: rgba(17, 20, 36, 0.6) !important;
   height: 100%;
   display: flex;
   flex-direction: column;
