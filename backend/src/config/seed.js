@@ -1,7 +1,9 @@
 import bcrypt from 'bcryptjs';
-import db, { run } from './database.js';
+import db, { run, get } from './database.js';
 
-const seedDatabase = async () => {
+// closeConnection is false when called from server.js at boot, since the shared db handle
+// must stay open for the running app; true when run standalone via `npm run seed`.
+export const seedDatabase = async ({ closeConnection = true } = {}) => {
   try {
     console.log('Starting database seeding...');
 
@@ -318,11 +320,46 @@ const seedDatabase = async () => {
     }
 
     console.log('Database seeded successfully!');
-    db.close();
+    if (closeConnection) db.close();
   } catch (error) {
     console.error('Seeding failed:', error);
-    process.exit(1);
+    if (closeConnection) {
+      process.exit(1);
+    } else {
+      throw error;
+    }
   }
 };
 
-seedDatabase();
+// Called on every server boot. Render's free tier has no persistent disk, so the SQLite file
+// is wiped on every restart/spin-down - this replaces needing shell access to re-run the seed
+// script by hand each time. Checks for existing rows first so it's a no-op wherever a real
+// persistent disk IS attached (a paid instance, or self-hosting).
+export const seedIfEmpty = async () => {
+  try {
+    const usersTable = await get(
+      `SELECT name FROM sqlite_master WHERE type='table' AND name='users'`
+    );
+    if (!usersTable) {
+      console.log('No schema found - running first-time database seed...');
+      await seedDatabase({ closeConnection: false });
+      return;
+    }
+
+    const row = await get(`SELECT COUNT(*) as count FROM users`);
+    if (!row || row.count === 0) {
+      console.log('users table is empty - running database seed...');
+      await seedDatabase({ closeConnection: false });
+    } else {
+      console.log('Database already has data, skipping auto-seed.');
+    }
+  } catch (error) {
+    console.error('Auto-seed check failed:', error);
+  }
+};
+
+// Still runnable directly for local dev: `npm run seed`
+const isRunDirectly = process.argv[1] && process.argv[1].endsWith('seed.js');
+if (isRunDirectly) {
+  seedDatabase();
+}
