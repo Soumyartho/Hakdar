@@ -1,0 +1,104 @@
+.my-applications-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.my-applications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.applications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.application-card {
+  padding: 1.5rem;
+  border-left: 4px solid var(--border-color);
+}
+
+.application-card.status-approved { border-left-color: #10b981; }
+.application-card.status-rejected { border-left-color: #ef4444; }
+.application-card.status-flagged { border-left-color: #f59e0b; }
+.application-card.status-pending { border-left-color: #64748b; }
+
+.application-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.application-card-header h3 {
+  margin: 0.25rem 0 0;
+  font-size: 1.15rem;
+}
+
+.scheme-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent-color);
+  background: rgba(255, 152, 0, 0.12);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+}
+
+.status-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.status-tag.status-approved { color: #10b981; background: rgba(16, 185, 129, 0.12); }
+.status-tag.status-rejected { color: #ef4444; background: rgba(239, 68, 68, 0.12); }
+.status-tag.status-flagged { color: #f59e0b; background: rgba(245, 158, 11, 0.12); }
+.status-tag.status-pending { color: #94a3b8; background: rgba(148, 163, 184, 0.12); }
+
+.application-meta {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin: 0.5rem 0;
+}
+
+.review-notes-box {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  margin: 0.75rem 0;
+}
+
+.review-notes-box p {
+  margin: 0.25rem 0 0;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+}
+
+.appeal-form {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.appeal-form-actions {
+  display: flex;
+  gap: 0.5rem;
+}

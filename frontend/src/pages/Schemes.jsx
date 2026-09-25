@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { api } from '../services/api';
-import { Check, AlertCircle, FileText, ChevronDown, ChevronUp, Link as LinkIcon, Info } from 'lucide-react';
+import { Check, AlertCircle, FileText, ChevronDown, ChevronUp, Link as LinkIcon, Info, Send, Upload } from 'lucide-react';
 import './Schemes.jsx.css';
 
 export default function Schemes() {
@@ -16,6 +17,13 @@ export default function Schemes() {
   });
   const [hasSearched, setHasSearched] = useState(false);
   const [expandedScheme, setExpandedScheme] = useState(null);
+
+  // "Apply" flow - a verified citizen session is required (see CitizenAuth.jsx), since applying
+  // creates a real, identity-linked record an officer will review, unlike the anonymous match check.
+  const citizenToken = localStorage.getItem('citizen_token');
+  const [applyingSchemeId, setApplyingSchemeId] = useState(null);
+  const [applyFiles, setApplyFiles] = useState([]);
+  const [applyState, setApplyState] = useState({ loading: false, error: '', success: false });
 
   // Fetch initial list of all schemes on mount
   useEffect(() => {
@@ -88,6 +96,35 @@ export default function Schemes() {
 
   const toggleExpand = (id) => {
     setExpandedScheme(expandedScheme === id ? null : id);
+  };
+
+  const openApplyForm = (schemeId) => {
+    setApplyingSchemeId(schemeId);
+    setApplyFiles([]);
+    setApplyState({ loading: false, error: '', success: false });
+  };
+
+  const handleApplySubmit = async (e, scheme) => {
+    e.preventDefault();
+    setApplyState({ loading: true, error: '', success: false });
+    try {
+      const formData = new FormData();
+      formData.append('scheme_id', scheme.id);
+      formData.append('age', profile.age);
+      formData.append('gender', profile.gender);
+      formData.append('income', profile.income);
+      formData.append('occupation', profile.occupation);
+      formData.append('pregnant_or_lactating', profile.pregnant_or_lactating);
+      formData.append('homeless_or_poor_housing', profile.homeless_or_poor_housing);
+      applyFiles.forEach((file) => formData.append('documents', file));
+
+      const res = await api.post('/applications', formData, citizenToken, true);
+      if (res.success) {
+        setApplyState({ loading: false, error: '', success: true });
+      }
+    } catch (err) {
+      setApplyState({ loading: false, error: err.message || 'Failed to submit application', success: false });
+    }
   };
 
   return (
@@ -229,6 +266,45 @@ export default function Schemes() {
                               <li key={i}>{r}</li>
                             ))}
                           </ul>
+                        </div>
+                      )}
+
+                      {isMatch === true && (
+                        <div className="apply-section">
+                          {!citizenToken ? (
+                            <Link to="/account/login" className="btn btn-primary btn-sm">
+                              <Send size={14} /> Log In to Apply
+                            </Link>
+                          ) : applyingSchemeId !== scheme.id ? (
+                            <button className="btn btn-primary btn-sm" onClick={() => openApplyForm(scheme.id)}>
+                              <Send size={14} /> Apply for This Scheme
+                            </button>
+                          ) : applyState.success ? (
+                            <div className="apply-success">
+                              <Check size={16} /> Application submitted! Track it under{' '}
+                              <Link to="/account/applications" className="gradient-text">My Applications</Link>.
+                            </div>
+                          ) : (
+                            <form className="apply-form" onSubmit={(e) => handleApplySubmit(e, scheme)}>
+                              <label className="form-label"><Upload size={14} /> Supporting Documents (PDF/JPG/PNG)</label>
+                              <input
+                                type="file"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                multiple
+                                onChange={(e) => setApplyFiles(Array.from(e.target.files))}
+                                className="form-input"
+                              />
+                              {applyState.error && <div className="apply-error">{applyState.error}</div>}
+                              <div className="apply-form-actions">
+                                <button type="submit" className="btn btn-primary btn-sm" disabled={applyState.loading}>
+                                  {applyState.loading ? 'Submitting...' : 'Submit Application'}
+                                </button>
+                                <button type="button" className="btn btn-secondary btn-sm" onClick={() => setApplyingSchemeId(null)}>
+                                  Cancel
+                                </button>
+                              </div>
+                            </form>
+                          )}
                         </div>
                       )}
 

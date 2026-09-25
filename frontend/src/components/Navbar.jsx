@@ -6,6 +6,7 @@ import './Navbar.css';
 export default function Navbar() {
   const location = useLocation();
   const token = localStorage.getItem('token');
+  const citizenToken = localStorage.getItem('citizen_token');
 
   return (
     <nav className="navbar glass-panel">
@@ -30,6 +31,15 @@ export default function Navbar() {
         </Link>
       </div>
       <div className="navbar-auth">
+        {citizenToken ? (
+          <Link to="/account/applications" className="btn btn-secondary btn-nav-admin">
+            <User size={18} /> <span>My Applications</span>
+          </Link>
+        ) : (
+          <Link to="/account/login" className="btn btn-secondary btn-nav-login">
+            <User size={18} /> <span>My Account</span>
+          </Link>
+        )}
         {token ? (
           <Link to="/admin" className="btn btn-secondary btn-nav-admin">
             <User size={18} /> <span>Dashboard</span>

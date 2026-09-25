@@ -331,6 +331,71 @@ export const seedDatabase = async ({ closeConnection = true } = {}) => {
   }
 };
 
+// Citizen identity, scheme applications and fraud-review tables. Kept separate from
+// seedDatabase()'s DROP-and-reseed cycle (called only on a genuinely fresh DB) since these hold
+// real user-generated data that must survive a scheme/officer reseed. CREATE TABLE IF NOT EXISTS
+// makes this safe to run unconditionally on every boot, including against an existing database.db
+// that predates these tables.
+export const ensureAppTables = async () => {
+  await run(`
+    CREATE TABLE IF NOT EXISTS citizens (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      full_name TEXT NOT NULL,
+      phone_hash TEXT UNIQUE NOT NULL,
+      phone_encrypted TEXT NOT NULL,
+      phone_verified_at DATETIME,
+      dob TEXT,
+      gender TEXT,
+      address TEXT,
+      aadhaar_hash TEXT UNIQUE NOT NULL,
+      aadhaar_last4 TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'active',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  await run(`
+    CREATE TABLE IF NOT EXISTS otp_verifications (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      phone_hash TEXT NOT NULL,
+      otp_hash TEXT NOT NULL,
+      purpose TEXT NOT NULL,
+      expires_at DATETIME NOT NULL,
+      consumed_at DATETIME,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  await run(`
+    CREATE TABLE IF NOT EXISTS scheme_applications (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      citizen_id INTEGER NOT NULL REFERENCES citizens(id),
+      scheme_id INTEGER NOT NULL REFERENCES welfare_schemes(id),
+      declared_profile TEXT NOT NULL,
+      eligibility_result TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'submitted',
+      document_paths TEXT NOT NULL DEFAULT '[]',
+      submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      reviewed_by INTEGER REFERENCES users(id),
+      reviewed_at DATETIME,
+      review_notes TEXT
+    )
+  `);
+
+  await run(`
+    CREATE TABLE IF NOT EXISTS fraud_flags (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      application_id INTEGER NOT NULL REFERENCES scheme_applications(id),
+      rule_triggered TEXT NOT NULL,
+      severity TEXT NOT NULL DEFAULT 'medium',
+      detected_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      resolved_by INTEGER REFERENCES users(id),
+      resolved_at DATETIME,
+      resolution TEXT
+    )
+  `);
+};
+
 // Called on every server boot. Render's free tier has no persistent disk, so the SQLite file
 // is wiped on every restart/spin-down - this replaces needing shell access to re-run the seed
 // script by hand each time. Checks for existing rows first so it's a no-op wherever a real

@@ -3,8 +3,13 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle, ShieldCheck, Activity, Users, Search, AlertCircle, Clock, FileText, Lock } from 'lucide-react';
 import './Home.css';
 import { api } from '../services/api';
+import useVideoAutoplay from '../hooks/useVideoAutoplay';
 
 export default function Home() {
+  // Keeps both cinemagraphs looping even when Safari blocks autoplay (Low Power Mode).
+  const heroVideoRef = useVideoAutoplay();
+  const closingVideoRef = useVideoAutoplay();
+
   // Quick eligibility estimator state on home page
   const [quickProfile, setQuickProfile] = useState({
     age: '25',
@@ -73,6 +78,7 @@ export default function Home() {
       <section className="hero-video-stage">
         <div className="hero-media-layer">
           <video
+            ref={heroVideoRef}
             className="hero-video-stage-media"
             autoPlay
             muted
@@ -391,6 +397,7 @@ export default function Home() {
       <section className="closing-cinemagraph">
         <div className="closing-cinemagraph-media">
           <video
+            ref={closingVideoRef}
             className="closing-cinemagraph-video"
             autoPlay
             muted

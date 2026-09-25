@@ -11,6 +11,8 @@ import Schemes from './pages/Schemes';
 import FileGrievance from './pages/FileGrievance';
 import TrackGrievance from './pages/TrackGrievance';
 import AdminDashboard from './pages/AdminDashboard';
+import CitizenAuth from './pages/CitizenAuth';
+import MyApplications from './pages/MyApplications';
 import './styles/variables.css';
 import './styles/main.css';
 
@@ -67,6 +69,8 @@ export default function App() {
             <Route path="/grievance/file" element={<FileGrievance />} />
             <Route path="/grievance/track" element={<TrackGrievance />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/account/login" element={<CitizenAuth />} />
+            <Route path="/account/applications" element={<MyApplications />} />
           </Routes>
           <Footer />
         </div>

@@ -219,11 +219,15 @@ button, input, select, textarea {
 
 /* High Contrast Header Text - safe against the live tricolor gradient */
 .gradient-text {
-  background: linear-gradient(135deg, #ffb74d 0%, #ff9800 100%);
+  background: linear-gradient(135deg, #ffd08a 0%, #ffa726 55%, #ff9100 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+  /* The glyph fill is transparent here, so any inherited text-shadow paints straight through the
+     letters and drags the gradient down to a muddy bronze. Kill it and get the same lift from a
+     drop-shadow instead, which filters the painted result rather than showing through it. */
+  text-shadow: none;
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.55));
 }
 
 /* Buttons */

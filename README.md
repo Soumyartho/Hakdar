@@ -97,10 +97,13 @@ Dev server includes:
 ```bash
 cd backend
 npm install
-node server.js  # Starts on http://localhost:3001
+npm run dev  # Starts on http://localhost:5001 (see backend/.env)
 ```
 
-Ensure the frontend is pointed at your backend API endpoint (default: `http://localhost:3001`).
+The server reads `PORT` from `backend/.env` and the frontend reads `VITE_API_URL` from `frontend/.env`;
+the two must agree. Both are set to `5001` rather than the code default of `5000` because macOS runs
+its AirPlay Receiver on port 5000 — it answers API calls with an empty `403`, which surfaces in the UI
+as an empty "no schemes found" state rather than an error.
 
 ## Key Components
 
