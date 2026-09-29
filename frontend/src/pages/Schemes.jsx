@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api';
-import { Check, AlertCircle, FileText, ChevronDown, ChevronUp, Link as LinkIcon, Info, Send, Upload } from 'lucide-react';
+import { Check, AlertCircle, FileText, ChevronDown, ChevronUp, Link as LinkIcon, Info, Send, Upload, Printer, ClipboardList } from 'lucide-react';
+import { useToast } from '../components/Toast';
 import './Schemes.jsx.css';
 
 export default function Schemes() {
+  const toast = useToast();
   const [schemes, setSchemes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState({
@@ -23,7 +25,9 @@ export default function Schemes() {
   const citizenToken = localStorage.getItem('citizen_token');
   const [applyingSchemeId, setApplyingSchemeId] = useState(null);
   const [applyFiles, setApplyFiles] = useState([]);
+  const [applyFileTypes, setApplyFileTypes] = useState([]);
   const [applyState, setApplyState] = useState({ loading: false, error: '', success: false });
+  const [applyReceipt, setApplyReceipt] = useState(null);
 
   // Fetch initial list of all schemes on mount
   useEffect(() => {
@@ -75,7 +79,7 @@ export default function Schemes() {
       }
     } catch (err) {
       console.error(err);
-      alert('Error searching: ' + err.message);
+      toast.error('Error searching: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -98,10 +102,39 @@ export default function Schemes() {
     setExpandedScheme(expandedScheme === id ? null : id);
   };
 
+  // The backend's rejection reason already states both the limit and the declared income as text
+  // (see eligibilityEngine.js) - this computes the actual gap between them so a citizen doesn't
+  // have to do the subtraction themselves. Only meaningful for the income rule specifically since
+  // it's the one figure citizens most often ask "how far off was I?" about.
+  const getIncomeMargin = (scheme) => {
+    const cap = scheme.rules?.max_income;
+    const declared = Number(profile.income);
+    if (!cap || !declared || declared <= cap) return null;
+    return declared - cap;
+  };
+
   const openApplyForm = (schemeId) => {
     setApplyingSchemeId(schemeId);
     setApplyFiles([]);
+    setApplyFileTypes([]);
     setApplyState({ loading: false, error: '', success: false });
+    setApplyReceipt(null);
+  };
+
+  const handleApplyFilesChange = (e) => {
+    const files = Array.from(e.target.files);
+    setApplyFiles(files);
+    // Keep any type already picked for a file still present; default new ones to unset so the
+    // citizen has to actively choose rather than silently leaving a document untagged.
+    setApplyFileTypes((prev) => files.map((_, i) => prev[i] || ''));
+  };
+
+  const setFileType = (index, value) => {
+    setApplyFileTypes((prev) => {
+      const next = [...prev];
+      next[index] = value;
+      return next;
+    });
   };
 
   const handleApplySubmit = async (e, scheme) => {
@@ -116,11 +149,13 @@ export default function Schemes() {
       formData.append('occupation', profile.occupation);
       formData.append('pregnant_or_lactating', profile.pregnant_or_lactating);
       formData.append('homeless_or_poor_housing', profile.homeless_or_poor_housing);
+      formData.append('documents_meta', JSON.stringify(applyFileTypes));
       applyFiles.forEach((file) => formData.append('documents', file));
 
       const res = await api.post('/applications', formData, citizenToken, true);
       if (res.success) {
         setApplyState({ loading: false, error: '', success: true });
+        setApplyReceipt(res.data);
       }
     } catch (err) {
       setApplyState({ loading: false, error: err.message || 'Failed to submit application', success: false });
@@ -266,6 +301,11 @@ export default function Schemes() {
                               <li key={i}>{r}</li>
                             ))}
                           </ul>
+                          {getIncomeMargin(scheme) != null && (
+                            <p className="income-margin-note">
+                              You're <strong>₹{getIncomeMargin(scheme).toLocaleString()}</strong> over the income limit for this scheme.
+                            </p>
+                          )}
                         </div>
                       )}
 
@@ -279,21 +319,79 @@ export default function Schemes() {
                             <button className="btn btn-primary btn-sm" onClick={() => openApplyForm(scheme.id)}>
                               <Send size={14} /> Apply for This Scheme
                             </button>
-                          ) : applyState.success ? (
-                            <div className="apply-success">
-                              <Check size={16} /> Application submitted! Track it under{' '}
-                              <Link to="/account/applications" className="gradient-text">My Applications</Link>.
+                          ) : applyState.success && applyReceipt ? (
+                            <div className="apply-receipt">
+                              <div className="apply-receipt-header">
+                                <Check size={18} /> Application Submitted
+                              </div>
+                              <dl className="apply-receipt-grid">
+                                <dt>Reference</dt><dd>Application #{applyReceipt.id}</dd>
+                                <dt>Scheme</dt><dd>{applyReceipt.scheme_title}</dd>
+                                <dt>Department</dt><dd>{applyReceipt.scheme_department}</dd>
+                                <dt>Submitted</dt><dd>{new Date(applyReceipt.submitted_at).toLocaleString()}</dd>
+                                <dt>Documents</dt>
+                                <dd>
+                                  {applyReceipt.document_count === 0 ? 'None attached' : (
+                                    <ul className="apply-receipt-doclist">
+                                      {Array.from({ length: applyReceipt.document_count }).map((_, i) => (
+                                        <li key={i}>{applyReceipt.document_types[i] || 'Untagged document'}</li>
+                                      ))}
+                                    </ul>
+                                  )}
+                                </dd>
+                              </dl>
+                              <p className="apply-receipt-note">Keep this reference number - you'll need it if you contact an officer about this application.</p>
+                              <div className="apply-form-actions">
+                                <button type="button" className="btn btn-secondary btn-sm" onClick={() => window.print()}>
+                                  <Printer size={14} /> Print / Save as PDF
+                                </button>
+                                <Link to="/account/applications" className="btn btn-primary btn-sm">
+                                  View in My Applications
+                                </Link>
+                              </div>
                             </div>
                           ) : (
                             <form className="apply-form" onSubmit={(e) => handleApplySubmit(e, scheme)}>
+                              <div className="required-docs-checklist">
+                                <p className="required-docs-title"><ClipboardList size={14} /> You'll typically need:</p>
+                                <ul>
+                                  {scheme.required_documents.map((doc, idx) => (
+                                    <li key={idx}>{doc}</li>
+                                  ))}
+                                </ul>
+                              </div>
+
                               <label className="form-label"><Upload size={14} /> Supporting Documents (PDF/JPG/PNG)</label>
                               <input
                                 type="file"
                                 accept=".pdf,.jpg,.jpeg,.png"
                                 multiple
-                                onChange={(e) => setApplyFiles(Array.from(e.target.files))}
+                                onChange={handleApplyFilesChange}
                                 className="form-input"
                               />
+
+                              {applyFiles.length > 0 && (
+                                <div className="apply-file-tags">
+                                  {applyFiles.map((file, idx) => (
+                                    <div key={idx} className="apply-file-tag-row">
+                                      <span className="apply-file-name" title={file.name}>{file.name}</span>
+                                      <select
+                                        className="form-input"
+                                        value={applyFileTypes[idx] || ''}
+                                        onChange={(e) => setFileType(idx, e.target.value)}
+                                        required
+                                      >
+                                        <option value="" disabled>This file is...</option>
+                                        {scheme.required_documents.map((doc, dIdx) => (
+                                          <option key={dIdx} value={doc}>{doc}</option>
+                                        ))}
+                                        <option value="Other">Other</option>
+                                      </select>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
                               {applyState.error && <div className="apply-error">{applyState.error}</div>}
                               <div className="apply-form-actions">
                                 <button type="submit" className="btn btn-primary btn-sm" disabled={applyState.loading}>

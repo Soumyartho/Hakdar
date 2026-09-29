@@ -192,7 +192,10 @@ export const seedDatabase = async ({ closeConnection = true } = {}) => {
           occupation: 'any',
           min_age: 18,
           gender: 'any',
-          homeless_or_poor_housing: true
+          homeless_or_poor_housing: true,
+          // One house grant per family, not per person - the fraud audit's household sweep only
+          // groups approved claims by household for schemes explicitly marked this way.
+          household_scoped: true
         }),
         external_link: 'https://pmayg.nic.in/'
       },
@@ -394,6 +397,89 @@ export const ensureAppTables = async () => {
       resolution TEXT
     )
   `);
+
+  await run(`
+    CREATE TABLE IF NOT EXISTS households (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      created_by_citizen_id INTEGER NOT NULL REFERENCES citizens(id),
+      address TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  await run(`
+    CREATE TABLE IF NOT EXISTS household_invites (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      household_id INTEGER NOT NULL REFERENCES households(id),
+      invited_citizen_id INTEGER NOT NULL REFERENCES citizens(id),
+      invited_by_citizen_id INTEGER NOT NULL REFERENCES citizens(id),
+      status TEXT NOT NULL DEFAULT 'pending',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      resolved_at DATETIME
+    )
+  `);
+
+  // citizens.household_id and scheme_applications.document_types are additive columns on tables
+  // that already existed before this feature - CREATE TABLE IF NOT EXISTS above is a no-op against
+  // a citizens/scheme_applications table from an older boot, so the columns need their own
+  // migration. SQLite has no "ADD COLUMN IF NOT EXISTS"; catching the duplicate-column error is
+  // the standard workaround, so this stays safe to run on every boot.
+  await addColumnIfMissing('citizens', 'household_id', 'INTEGER REFERENCES households(id)');
+  await addColumnIfMissing('scheme_applications', 'document_types', "TEXT NOT NULL DEFAULT '[]'");
+
+  await run(`
+    CREATE TABLE IF NOT EXISTS document_verifications (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      application_id INTEGER NOT NULL REFERENCES scheme_applications(id),
+      file_path TEXT NOT NULL,
+      claimed_type TEXT,
+      ocr_matched INTEGER,
+      ocr_reason TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  await run(`
+    CREATE TABLE IF NOT EXISTS application_verifications (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      application_id INTEGER NOT NULL UNIQUE REFERENCES scheme_applications(id),
+      reviewer_id INTEGER NOT NULL REFERENCES users(id),
+      identity_confirmed INTEGER NOT NULL DEFAULT 0,
+      income_confirmed INTEGER NOT NULL DEFAULT 0,
+      documents_authentic INTEGER NOT NULL DEFAULT 0,
+      notes TEXT,
+      verified_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  // Maker-checker: a previously fraud-flagged application's approval isn't final until a second,
+  // different officer countersigns - reviewed_by/reviewed_at (already on this table) record the
+  // FIRST officer's decision, these record the second.
+  await addColumnIfMissing('scheme_applications', 'second_reviewer_id', 'INTEGER REFERENCES users(id)');
+  await addColumnIfMissing('scheme_applications', 'second_reviewed_at', 'DATETIME');
+
+  await ensureHouseholdScopedFlag();
+};
+
+const addColumnIfMissing = async (table, column, definition) => {
+  try {
+    await run(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  } catch (error) {
+    if (!/duplicate column name/i.test(error.message)) throw error;
+  }
+};
+
+// seedDatabase()'s own PMAY-G rules already declare household_scoped: true for a FRESH install,
+// but that INSERT never re-runs against an existing database.db (seedDatabase only runs when the
+// users table is empty) - this patches the flag onto an already-seeded row so the household
+// duplicate-benefit sweep works without requiring a full re-seed.
+const ensureHouseholdScopedFlag = async () => {
+  const row = await get(`SELECT id, rules FROM welfare_schemes WHERE title LIKE 'Pradhan Mantri Awas Yojana%'`);
+  if (!row) return;
+  const rules = JSON.parse(row.rules);
+  if (rules.household_scoped) return;
+  rules.household_scoped = true;
+  await run(`UPDATE welfare_schemes SET rules = ? WHERE id = ?`, [JSON.stringify(rules), row.id]);
 };
 
 // Called on every server boot. Render's free tier has no persistent disk, so the SQLite file

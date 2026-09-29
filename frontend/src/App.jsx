@@ -5,6 +5,7 @@ import GrainyGradient from './components/GrainyGradient';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Chatbot from './components/Chatbot';
+import { ToastProvider } from './components/Toast';
 import ScrollExperience from './scroll/ScrollExperience';
 import Home from './pages/Home';
 import Schemes from './pages/Schemes';
@@ -13,6 +14,7 @@ import TrackGrievance from './pages/TrackGrievance';
 import AdminDashboard from './pages/AdminDashboard';
 import CitizenAuth from './pages/CitizenAuth';
 import MyApplications from './pages/MyApplications';
+import Household from './pages/Household';
 import './styles/variables.css';
 import './styles/main.css';
 
@@ -48,10 +50,11 @@ export default function App() {
   };
 
   return (
+    <ToastProvider>
     <Router>
-      <div 
-        className="app-container" 
-        onMouseMove={handleMouseMove} 
+      <div
+        className="app-container"
+        onMouseMove={handleMouseMove}
         onClick={handleScreenClick}
       >
         {/* Full-screen Shader Canvas Background */}
@@ -71,6 +74,7 @@ export default function App() {
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/account/login" element={<CitizenAuth />} />
             <Route path="/account/applications" element={<MyApplications />} />
+            <Route path="/account/household" element={<Household />} />
           </Routes>
           <Footer />
         </div>
@@ -82,5 +86,6 @@ export default function App() {
         <ScrollExperience />
       </div>
     </Router>
+    </ToastProvider>
   );
 }

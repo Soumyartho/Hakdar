@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { api } from '../services/api';
 import MapWidget from '../components/MapWidget';
 import { FileText, MapPin, Image, Video, CheckCircle, Copy, AlertCircle } from 'lucide-react';
+import { useToast } from '../components/Toast';
 import './FileGrievance.css';
 
 export default function FileGrievance() {
+  const toast = useToast();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -39,7 +41,7 @@ export default function FileGrievance() {
 
   const detectLocation = () => {
     if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser.');
+      toast.error('Geolocation is not supported by your browser.');
       return;
     }
     setGpsLoading(true);
@@ -54,7 +56,7 @@ export default function FileGrievance() {
       },
       (error) => {
         console.error('Error fetching GPS:', error);
-        alert('Could not retrieve GPS location automatically. Please click manually on the map.');
+        toast.error('Could not retrieve GPS location automatically. Please click manually on the map.');
         setGpsLoading(false);
       },
       { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
@@ -97,7 +99,7 @@ export default function FileGrievance() {
   const copyTrackingId = () => {
     if (submittedData) {
       navigator.clipboard.writeText(submittedData.tracking_id);
-      alert('Tracking ID copied to clipboard!');
+      toast.success('Tracking ID copied to clipboard!');
     }
   };
 

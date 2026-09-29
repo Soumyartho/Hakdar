@@ -332,10 +332,24 @@
 }
 
 .view-media-link {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   font-size: 0.85rem;
   color: var(--accent-color);
   font-weight: 600;
   text-decoration: underline;
+  margin-bottom: 0.4rem;
+}
+
+.doc-type-tag {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
 }
 
 .input-group {
@@ -428,6 +442,136 @@
 .badge.status-rejected { background: rgba(239, 68, 68, 0.18); color: #f87171; }
 .badge.status-flagged { background: rgba(245, 158, 11, 0.18); color: #fbbf24; }
 .badge.status-revoked { background: rgba(239, 68, 68, 0.18); color: #f87171; }
+.badge.status-pending_countersign { background: rgba(99, 102, 241, 0.18); color: #a5b4fc; }
+
+.badge.severity-critical { background: rgba(239, 68, 68, 0.22); color: #f87171; }
+.badge.severity-high { background: rgba(249, 115, 22, 0.2); color: #fb923c; }
+.badge.severity-medium { background: rgba(245, 158, 11, 0.18); color: #fbbf24; }
+
+.fraud-flags-box {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.1rem;
+  margin: 1rem 0;
+}
+
+.fraud-flags-box h5 {
+  margin: 0 0 0.6rem;
+  font-size: 0.85rem;
+  color: #fca5a5;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.fraud-flag-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.3rem 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.fraud-flag-rule {
+  text-transform: capitalize;
+}
+
+.ocr-check-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.1rem;
+  margin: 1rem 0;
+}
+
+.ocr-check-box h5 {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.6rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.ocr-check-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.4rem;
+  font-size: 0.82rem;
+}
+.ocr-check-row:last-child { margin-bottom: 0; }
+
+.ocr-check-type { font-weight: 600; color: var(--text-secondary); }
+.ocr-check-reason { color: var(--text-muted); font-size: 0.78rem; }
+
+.ocr-check-row.ocr-pass { background: rgba(16, 185, 129, 0.1); }
+.ocr-check-row.ocr-pass .ocr-check-type { color: #34d399; }
+.ocr-check-row.ocr-fail { background: rgba(239, 68, 68, 0.1); }
+.ocr-check-row.ocr-fail .ocr-check-type { color: #f87171; }
+.ocr-check-row.ocr-skip { background: rgba(148, 163, 184, 0.08); }
+
+.checklist-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.1rem;
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.checklist-box h5 {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.2rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.countersign-box {
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1.1rem;
+  margin: 1rem 0;
+}
+
+.countersign-box h5 {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.5rem;
+  color: #a5b4fc;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.countersign-box p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
 
 .badge {
   display: inline-block;

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import { ShieldCheck, User, Phone, CreditCard, ArrowRight } from 'lucide-react';
+import { isValidAadhaar } from '../utils/aadhaarValidator';
 import './CitizenAuth.css';
 
 // Two independent flows share one page: a new citizen registers (identity form -> OTP), a
@@ -16,6 +17,7 @@ export default function CitizenAuth() {
   const [error, setError] = useState('');
   const [demoOtp, setDemoOtp] = useState('');
   const [otp, setOtp] = useState('');
+  const [aadhaarError, setAadhaarError] = useState('');
 
   const [form, setForm] = useState({
     full_name: '',
@@ -28,11 +30,21 @@ export default function CitizenAuth() {
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    if (e.target.name === 'aadhaar_number' && aadhaarError) setAadhaarError('');
+  };
+
+  const handleAadhaarBlur = () => {
+    if (!form.aadhaar_number) return;
+    setAadhaarError(isValidAadhaar(form.aadhaar_number) ? '' : 'That doesn\'t look like a valid Aadhaar number - please double-check the digits.');
   };
 
   const handleRequestOtp = async (e) => {
     e.preventDefault();
     setError('');
+    if (mode === 'register' && !isValidAadhaar(form.aadhaar_number)) {
+      setAadhaarError('That doesn\'t look like a valid Aadhaar number - please double-check the digits.');
+      return;
+    }
     setLoading(true);
     try {
       const endpoint = mode === 'register' ? '/citizens/register/request-otp' : '/citizens/login/request-otp';
@@ -107,14 +119,16 @@ export default function CitizenAuth() {
                 <div className="form-group">
                   <label className="form-label"><CreditCard size={14} /> Aadhaar Number</label>
                   <input
-                    className="form-input"
+                    className={`form-input${aadhaarError ? ' input-invalid' : ''}`}
                     name="aadhaar_number"
                     value={form.aadhaar_number}
                     onChange={handleChange}
+                    onBlur={handleAadhaarBlur}
                     placeholder="12-digit Aadhaar number"
                     maxLength={12}
                     required
                   />
+                  {aadhaarError && <p className="field-error">{aadhaarError}</p>}
                 </div>
                 <div className="form-row">
                   <div className="form-group">

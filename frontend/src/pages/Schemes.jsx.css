@@ -222,6 +222,19 @@
   padding-left: 1.25rem;
 }
 
+.income-margin-note {
+  margin: 0.6rem 0 0;
+  padding-top: 0.6rem;
+  border-top: 1px dashed rgba(239, 68, 68, 0.3);
+  color: var(--text-secondary);
+}
+
+.income-margin-note strong {
+  display: inline;
+  margin: 0;
+  color: #f87171;
+}
+
 .apply-section {
   margin-top: 1rem;
 }
@@ -250,13 +263,121 @@
   font-size: 0.8rem;
 }
 
-.apply-success {
+.required-docs-checklist {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 0.9rem;
+}
+
+.required-docs-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.required-docs-checklist ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.required-docs-checklist li {
+  margin-bottom: 0.2rem;
+}
+
+.apply-file-tags {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.apply-file-tag-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.apply-file-name {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.apply-receipt {
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.1rem;
+}
+
+.apply-receipt-header {
   display: flex;
   align-items: center;
   gap: 0.4rem;
   color: #10b981;
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+}
+
+.apply-receipt-grid {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.35rem 1rem;
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+}
+
+.apply-receipt-grid dt {
+  color: var(--text-muted);
   font-weight: 600;
-  font-size: 0.9rem;
+}
+
+.apply-receipt-grid dd {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.apply-receipt-doclist {
+  margin: 0;
+  padding-left: 1rem;
+}
+
+.apply-receipt-note {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0 0 0.85rem;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .apply-receipt, .apply-receipt * {
+    visibility: visible;
+  }
+  .apply-receipt {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    color: #000;
+    border: none;
+  }
+  .apply-receipt-header, .apply-receipt-grid dd, .apply-receipt-note { color: #000; }
+  .apply-form-actions { display: none; }
 }
 
 /* Expanded Card styling */

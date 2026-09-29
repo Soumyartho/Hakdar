@@ -1,5 +1,6 @@
 import { ApplicationModel } from '../models/applicationModel.js';
 import { FraudFlagModel } from '../models/fraudFlagModel.js';
+import { DocumentVerificationModel } from '../models/documentVerificationModel.js';
 import { evaluateEligibility } from './eligibilityEngine.js';
 
 let intervalId = null;
@@ -70,6 +71,93 @@ const runStaleReverificationSweep = async () => {
   }
 };
 
+// Same shape as runDuplicateClaimSweep, grouped by household instead of Aadhaar identity - catches
+// separate family members (separate citizen records, separate Aadhaar numbers, so the identity
+// sweep above can't see it) each holding an approved claim on a scheme meant for one grant per
+// household (rules.household_scoped - see PMAY-G's seeded rules).
+const runHouseholdDuplicateSweep = async () => {
+  const rows = await ApplicationModel.getApprovedGroupedByHousehold();
+  const byHouseholdAndScheme = new Map();
+  for (const row of rows) {
+    let rules;
+    try {
+      rules = JSON.parse(row.scheme_rules);
+    } catch {
+      continue;
+    }
+    if (!rules.household_scoped) continue;
+    const key = `${row.household_id}:${row.scheme_id}`;
+    if (!byHouseholdAndScheme.has(key)) byHouseholdAndScheme.set(key, []);
+    byHouseholdAndScheme.get(key).push(row);
+  }
+  for (const claims of byHouseholdAndScheme.values()) {
+    if (claims.length <= 1) continue;
+    for (const claim of claims) {
+      await flagIfNotAlreadyOpen(
+        claim.application_id,
+        'household_duplicate_benefit',
+        'critical',
+        `Routine check: ${claims.length} household members hold approved applications for "${claim.scheme_title}", a scheme meant for one claim per household`
+      );
+    }
+  }
+};
+
+// A citizen's declared income shouldn't swing wildly between applications submitted around the
+// same time - a genuine income change is possible, but a >1.5x spread is worth an officer's eyes
+// rather than trusting whichever declaration happened to get reviewed first.
+const INCOME_INCONSISTENCY_RATIO = 1.5;
+
+const runIncomeConsistencySweep = async () => {
+  const rows = await ApplicationModel.getIncomeDeclarationsByCitizen();
+  const byCitizen = new Map();
+  for (const row of rows) {
+    let profile;
+    try {
+      profile = JSON.parse(row.declared_profile);
+    } catch {
+      continue;
+    }
+    const income = Number(profile.income);
+    if (!income) continue;
+    if (!byCitizen.has(row.citizen_id)) byCitizen.set(row.citizen_id, []);
+    byCitizen.get(row.citizen_id).push({ applicationId: row.application_id, income });
+  }
+  for (const declarations of byCitizen.values()) {
+    if (declarations.length <= 1) continue;
+    const incomes = declarations.map((d) => d.income);
+    const min = Math.min(...incomes);
+    const max = Math.max(...incomes);
+    if (min <= 0 || max / min <= INCOME_INCONSISTENCY_RATIO) continue;
+    for (const d of declarations) {
+      await flagIfNotAlreadyOpen(
+        d.applicationId,
+        'income_inconsistency',
+        'medium',
+        `Routine check: declared income varies from ₹${min.toLocaleString()} to ₹${max.toLocaleString()} across this citizen's applications`
+      );
+    }
+  }
+};
+
+// Catches the case where the automated document check (documentVerifier.js, run at submission
+// time) explicitly found a mismatch but an officer approved the application anyway - a signal that
+// got overridden or missed at review time, surfaced again for a second look.
+const runDocumentConsistencySweep = async () => {
+  const mismatches = await DocumentVerificationModel.getFailedForApprovedApplications();
+  const seen = new Set();
+  for (const row of mismatches) {
+    if (seen.has(row.application_id)) continue;
+    seen.add(row.application_id);
+    await flagIfNotAlreadyOpen(
+      row.application_id,
+      'document_mismatch',
+      'high',
+      `Routine check: an automated document check failed (${row.claimed_type || 'untagged document'} — ${row.ocr_reason}) but the application was approved anyway`
+    );
+  }
+};
+
 export const startFraudAuditJob = (checkIntervalMs = 30000) => {
   if (intervalId) return;
   console.log(`Fraud audit job started. Sweeping every ${checkIntervalMs / 1000}s...`);
@@ -79,6 +167,9 @@ export const startFraudAuditJob = (checkIntervalMs = 30000) => {
       await runReEligibilitySweep();
       await runDuplicateClaimSweep();
       await runStaleReverificationSweep();
+      await runHouseholdDuplicateSweep();
+      await runIncomeConsistencySweep();
+      await runDocumentConsistencySweep();
     } catch (error) {
       console.error('[Fraud Audit] Error running sweep:', error);
     }

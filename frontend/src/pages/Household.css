@@ -1,0 +1,144 @@
+.household-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.household-invite-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 1.3rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(255, 152, 0, 0.4);
+  color: var(--accent-color);
+}
+
+.household-invite-banner h4 {
+  margin: 0 0 0.25rem;
+  color: var(--text-primary);
+}
+
+.household-invite-banner p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.household-invite-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex: none;
+}
+
+.household-empty {
+  text-align: center;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+}
+
+.household-empty svg {
+  color: var(--accent-color);
+  margin-bottom: 0.5rem;
+}
+
+.household-create-form {
+  margin-top: 1rem;
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  text-align: left;
+}
+
+.household-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.household-card {
+  padding: 1.5rem;
+}
+
+.household-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.25rem;
+  font-size: 1.1rem;
+}
+
+.household-created-note {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin: 0 0 1rem;
+}
+
+.household-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  margin: 1rem 0 0.5rem;
+}
+
+.household-members-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.household-members-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+.household-member-name { color: var(--text-secondary); font-weight: 600; }
+.household-member-meta { color: var(--text-muted); font-size: 0.78rem; }
+
+.household-pending-badge {
+  font-size: 0.7rem;
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.15);
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+}
+
+.household-invite-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.household-back-link {
+  margin-top: 2rem;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 720px) {
+  .household-panels {
+    grid-template-columns: 1fr;
+  }
+  .household-invite-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

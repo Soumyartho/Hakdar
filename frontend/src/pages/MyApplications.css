@@ -13,6 +13,11 @@
   flex-wrap: wrap;
 }
 
+.my-applications-header-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
 .applications-list {
   display: flex;
   flex-direction: column;
@@ -74,6 +79,79 @@
   color: var(--text-muted);
   font-size: 0.85rem;
   margin: 0.5rem 0;
+}
+
+.app-timeline {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 0.9rem 0;
+}
+
+.app-timeline-step {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  color: var(--text-muted);
+}
+
+.app-timeline-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+  flex: none;
+}
+
+.app-timeline-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.app-timeline-date {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.app-timeline-done .app-timeline-dot { background: rgba(16, 185, 129, 0.18); color: #10b981; }
+.app-timeline-done .app-timeline-label { color: var(--text-secondary); }
+
+.app-timeline-active .app-timeline-dot {
+  background: rgba(255, 152, 0, 0.2);
+  color: var(--accent-color);
+  animation: timeline-pulse 1.8s ease-in-out infinite;
+}
+.app-timeline-active .app-timeline-label { color: var(--accent-color); }
+
+.app-timeline-upcoming .app-timeline-dot { background: rgba(148, 163, 184, 0.1); color: #64748b; }
+
+.app-timeline-step.status-approved .app-timeline-dot { background: rgba(16, 185, 129, 0.18); color: #10b981; }
+.app-timeline-step.status-rejected .app-timeline-dot { background: rgba(239, 68, 68, 0.18); color: #ef4444; }
+.app-timeline-step.status-flagged .app-timeline-dot { background: rgba(245, 158, 11, 0.18); color: #f59e0b; }
+
+.app-timeline-connector {
+  width: 20px;
+  height: 2px;
+  background: rgba(148, 163, 184, 0.2);
+  flex: none;
+}
+.app-timeline-connector.done { background: rgba(16, 185, 129, 0.4); }
+
+@keyframes timeline-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.35); }
+  50% { box-shadow: 0 0 0 4px rgba(255, 152, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-timeline-active .app-timeline-dot { animation: none; }
 }
 
 .review-notes-box {

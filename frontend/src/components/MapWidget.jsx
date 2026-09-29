@@ -74,29 +74,15 @@ export default function MapWidget({
       scrollWheelZoom: true
     }).setView(DEFAULT_CENTER, 13);
 
-    // Dark basemap. Some networks/extensions block the CARTO CDN, which leaves Leaflet showing
-    // an empty grey container - fall back to plain OpenStreetMap tiles if that happens.
-    const cartoLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd',
-      maxZoom: 20
-    });
-
-    let tileErrors = 0;
-    let didFallback = false;
-    cartoLayer.on('tileerror', () => {
-      tileErrors += 1;
-      // A single miss can just be a transient hiccup; repeated ones mean the CDN is unreachable.
-      if (didFallback || tileErrors < 3) return;
-      didFallback = true;
-      console.warn('[MapWidget] CARTO tiles unreachable, falling back to OpenStreetMap.');
-      map.removeLayer(cartoLayer);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: 19
-      }).addTo(map);
-    });
-    cartoLayer.addTo(map);
+    // CARTO's free dark_all basemap now requires an API key - it returns HTTP 200 with a
+    // "API key required" placeholder image instead of erroring, so Leaflet's tileerror event
+    // never fires and the old CARTO-to-OSM fallback below never triggered. Using OpenStreetMap's
+    // standard tiles directly avoids the key requirement entirely (light basemap instead of dark).
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      subdomains: 'abc',
+      maxZoom: 19
+    }).addTo(map);
 
     mapRef.current = map;
     markersGroupRef.current = L.layerGroup().addTo(map);

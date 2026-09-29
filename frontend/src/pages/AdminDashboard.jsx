@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { api, API_ROOT } from '../services/api';
 import MapWidget from '../components/MapWidget';
-import { ShieldCheck, LogOut, AlertCircle, Eye, RefreshCw, HelpCircle, ShieldAlert, FileCheck } from 'lucide-react';
+import { ShieldCheck, LogOut, AlertCircle, Eye, RefreshCw, HelpCircle, ShieldAlert, FileCheck, ScanSearch, CheckSquare, UserCheck } from 'lucide-react';
+import { useToast } from '../components/Toast';
 import './AdminDashboard.css';
 
 export default function AdminDashboard() {
+  const toast = useToast();
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('grievances'); // 'grievances' | 'applications' | 'flagged'
@@ -26,6 +28,64 @@ export default function AdminDashboard() {
   const [flagged, setFlagged] = useState([]);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [reviewNotes, setReviewNotes] = useState('');
+
+  // 3.1/3.2 verification panel: OCR cross-check results + the officer's own structured checklist,
+  // fetched together whenever a different application is selected.
+  const [verificationDocs, setVerificationDocs] = useState([]);
+  const EMPTY_CHECKLIST = { identity_confirmed: false, income_confirmed: false, documents_authentic: false, notes: '' };
+  const [checklist, setChecklist] = useState(EMPTY_CHECKLIST);
+  const [checklistSaving, setChecklistSaving] = useState(false);
+
+  useEffect(() => {
+    if (!selectedApplication) {
+      setVerificationDocs([]);
+      setChecklist(EMPTY_CHECKLIST);
+      return;
+    }
+    (async () => {
+      try {
+        const res = await api.get(`/applications/${selectedApplication.id}/verifications`, token);
+        if (res.success) {
+          setVerificationDocs(res.data.documents || []);
+          const c = res.data.checklist;
+          setChecklist(c
+            ? { identity_confirmed: !!c.identity_confirmed, income_confirmed: !!c.income_confirmed, documents_authentic: !!c.documents_authentic, notes: c.notes || '' }
+            : EMPTY_CHECKLIST);
+        }
+      } catch (err) {
+        console.error('Error loading verification details:', err);
+      }
+    })();
+  }, [selectedApplication?.id]);
+
+  const checklistComplete = checklist.identity_confirmed && checklist.income_confirmed && checklist.documents_authentic;
+
+  const saveChecklist = async () => {
+    if (!selectedApplication) return;
+    setChecklistSaving(true);
+    try {
+      const res = await api.patch(`/applications/${selectedApplication.id}/checklist`, checklist, token);
+      if (res.success) toast.success('Verification checklist saved.');
+    } catch (err) {
+      toast.error('Error saving checklist: ' + err.message);
+    } finally {
+      setChecklistSaving(false);
+    }
+  };
+
+  const handleCountersign = async (status) => {
+    if (!selectedApplication) return;
+    try {
+      const res = await api.patch(`/applications/${selectedApplication.id}/countersign`, { status }, token);
+      if (res.success) {
+        toast.success(status === 'approved' ? 'Countersigned and approved.' : 'Countersigned and rejected.');
+        setSelectedApplication(null);
+        fetchDashboardData();
+      }
+    } catch (err) {
+      toast.error('Error countersigning: ' + err.message);
+    }
+  };
 
   useEffect(() => {
     if (token) {
@@ -106,13 +166,13 @@ export default function AdminDashboard() {
       }, token);
 
       if (res.success) {
-        alert('Grievance status updated successfully.');
+        toast.success('Grievance status updated successfully.');
         setSelectedGrievance(prev => ({ ...prev, status: statusUpdate }));
         fetchDashboardData();
       }
     } catch (err) {
       console.error(err);
-      alert('Error updating status: ' + err.message);
+      toast.error('Error updating status: ' + err.message);
     }
   };
 
@@ -126,14 +186,14 @@ export default function AdminDashboard() {
       }, token);
 
       if (res.success) {
-        alert('Grievance marked as Resolved.');
+        toast.success('Grievance marked as Resolved.');
         setResolutionNotes('');
         setSelectedGrievance(null);
         fetchDashboardData();
       }
     } catch (err) {
       console.error(err);
-      alert('Error resolving grievance: ' + err.message);
+      toast.error('Error resolving grievance: ' + err.message);
     }
   };
 
@@ -142,13 +202,13 @@ export default function AdminDashboard() {
     try {
       const res = await api.patch(`/applications/${selectedApplication.id}/review`, { status, notes: reviewNotes }, token);
       if (res.success) {
-        alert(`Application marked as ${status}.`);
+        toast.success(`Application marked as ${status}.`);
         setReviewNotes('');
         setSelectedApplication(null);
         fetchDashboardData();
       }
     } catch (err) {
-      alert('Error updating application: ' + err.message);
+      toast.error('Error updating application: ' + err.message);
     }
   };
 
@@ -472,7 +532,12 @@ export default function AdminDashboard() {
                         <tr key={a.id} className={selectedApplication?.id === a.id ? 'active-row' : ''}>
                           <td className="subject-text">{a.scheme_title}</td>
                           <td>
-                            <span className={`badge status-${a.status}`}>{a.status}</span>
+                            <span className={`badge status-${a.status}`}>{a.status.replaceAll('_', ' ')}</span>
+                            {activeTab === 'flagged' && a.flags && a.flags.length > 0 && (
+                              <span className="badge severity-critical" style={{ marginLeft: 6 }}>
+                                {a.flags.length} reason{a.flags.length > 1 ? 's' : ''}
+                              </span>
+                            )}
                           </td>
                           <td>{new Date(a.submitted_at).toLocaleDateString()}</td>
                           <td>
@@ -499,7 +564,7 @@ export default function AdminDashboard() {
               <div className="action-details">
                 <div className="details-header">
                   <span className="tracking-code-badge">Application #{selectedApplication.id}</span>
-                  <span className={`badge status-${selectedApplication.status}`}>{selectedApplication.status}</span>
+                  <span className={`badge status-${selectedApplication.status}`}>{selectedApplication.status.replaceAll('_', ' ')}</span>
                 </div>
 
                 <h4>{selectedApplication.scheme_title}</h4>
@@ -515,6 +580,18 @@ export default function AdminDashboard() {
                   </ul>
                 </div>
 
+                {selectedApplication.flags && selectedApplication.flags.length > 0 && (
+                  <div className="fraud-flags-box">
+                    <h5><ShieldAlert size={13} /> Why this was flagged</h5>
+                    {selectedApplication.flags.map((f, idx) => (
+                      <div key={idx} className="fraud-flag-row">
+                        <span className="fraud-flag-rule">{f.rule_triggered.replaceAll('_', ' ')}</span>
+                        <span className={`badge severity-${f.severity}`}>{f.severity}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 {selectedApplication.document_paths.length > 0 && (
                   <div className="media-preview">
                     <h5>Submitted Documents</h5>
@@ -527,7 +604,22 @@ export default function AdminDashboard() {
                         className="view-media-link"
                       >
                         <FileCheck size={14} /> Document {idx + 1} ({docPath.split('.').pop().toUpperCase()})
+                        {selectedApplication.document_types?.[idx] && (
+                          <span className="doc-type-tag">tagged: {selectedApplication.document_types[idx]}</span>
+                        )}
                       </a>
+                    ))}
+                  </div>
+                )}
+
+                {verificationDocs.length > 0 && (
+                  <div className="ocr-check-box">
+                    <h5><ScanSearch size={13} /> Automated Document Check</h5>
+                    {verificationDocs.map((v) => (
+                      <div key={v.id} className={`ocr-check-row ${v.ocr_matched === 1 ? 'ocr-pass' : v.ocr_matched === 0 ? 'ocr-fail' : 'ocr-skip'}`}>
+                        <span className="ocr-check-type">{v.claimed_type || 'Untagged document'}</span>
+                        <span className="ocr-check-reason">{v.ocr_reason}</span>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -539,29 +631,96 @@ export default function AdminDashboard() {
                   </div>
                 )}
 
-                <form className="resolve-form" onSubmit={(e) => e.preventDefault()}>
-                  <div className="form-group">
-                    <label className="form-label">Review Notes</label>
-                    <textarea
-                      value={reviewNotes}
-                      onChange={(e) => setReviewNotes(e.target.value)}
-                      placeholder="Reason for this decision..."
-                      className="form-input"
-                      rows={3}
-                    />
+                {selectedApplication.status === 'pending_countersign' ? (
+                  <div className="countersign-box">
+                    <h5><UserCheck size={13} /> Awaiting Countersignature</h5>
+                    {selectedApplication.reviewed_by === user?.id ? (
+                      <p>You approved this application - it was previously fraud-flagged, so a <em>different</em> officer must countersign before it's final.</p>
+                    ) : (
+                      <>
+                        <p>Another officer approved this previously-flagged application. Review it independently before countersigning.</p>
+                        <div className="review-action-buttons">
+                          <button type="button" className="btn btn-primary" onClick={() => handleCountersign('approved')}>
+                            Countersign &amp; Approve
+                          </button>
+                          <button type="button" className="btn btn-danger" onClick={() => handleCountersign('rejected')}>
+                            Countersign &amp; Reject
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
-                  <div className="review-action-buttons">
-                    <button type="button" className="btn btn-primary" onClick={() => handleApplicationReview('approved')}>
-                      Approve
-                    </button>
-                    <button type="button" className="btn btn-danger" onClick={() => handleApplicationReview('rejected')}>
-                      Reject
-                    </button>
-                    <button type="button" className="btn btn-secondary" onClick={() => handleApplicationReview('revoked')}>
-                      Revoke
-                    </button>
-                  </div>
-                </form>
+                ) : (
+                  <>
+                    <div className="checklist-box">
+                      <h5><CheckSquare size={13} /> Verification Checklist</h5>
+                      <label className="checklist-item">
+                        <input
+                          type="checkbox"
+                          checked={checklist.identity_confirmed}
+                          onChange={(e) => setChecklist((prev) => ({ ...prev, identity_confirmed: e.target.checked }))}
+                        />
+                        <span>Identity document matches the declared profile</span>
+                      </label>
+                      <label className="checklist-item">
+                        <input
+                          type="checkbox"
+                          checked={checklist.income_confirmed}
+                          onChange={(e) => setChecklist((prev) => ({ ...prev, income_confirmed: e.target.checked }))}
+                        />
+                        <span>Income proof is consistent with the declared income</span>
+                      </label>
+                      <label className="checklist-item">
+                        <input
+                          type="checkbox"
+                          checked={checklist.documents_authentic}
+                          onChange={(e) => setChecklist((prev) => ({ ...prev, documents_authentic: e.target.checked }))}
+                        />
+                        <span>Documents appear authentic, not tampered with</span>
+                      </label>
+                      <textarea
+                        className="form-input"
+                        rows={2}
+                        placeholder="Verification notes (optional)..."
+                        value={checklist.notes}
+                        onChange={(e) => setChecklist((prev) => ({ ...prev, notes: e.target.value }))}
+                      />
+                      <button type="button" className="btn btn-secondary btn-sm" disabled={checklistSaving} onClick={saveChecklist}>
+                        {checklistSaving ? 'Saving...' : 'Save Checklist'}
+                      </button>
+                    </div>
+
+                    <form className="resolve-form" onSubmit={(e) => e.preventDefault()}>
+                      <div className="form-group">
+                        <label className="form-label">Review Notes</label>
+                        <textarea
+                          value={reviewNotes}
+                          onChange={(e) => setReviewNotes(e.target.value)}
+                          placeholder="Reason for this decision..."
+                          className="form-input"
+                          rows={3}
+                        />
+                      </div>
+                      <div className="review-action-buttons">
+                        <button
+                          type="button"
+                          className="btn btn-primary"
+                          disabled={!checklistComplete}
+                          title={checklistComplete ? '' : 'Complete the verification checklist first'}
+                          onClick={() => handleApplicationReview('approved')}
+                        >
+                          Approve
+                        </button>
+                        <button type="button" className="btn btn-danger" onClick={() => handleApplicationReview('rejected')}>
+                          Reject
+                        </button>
+                        <button type="button" className="btn btn-secondary" onClick={() => handleApplicationReview('revoked')}>
+                          Revoke
+                        </button>
+                      </div>
+                    </form>
+                  </>
+                )}
               </div>
             ) : (
               <div className="empty-details">

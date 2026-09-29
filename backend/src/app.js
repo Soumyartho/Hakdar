@@ -9,6 +9,7 @@ import schemeRoutes from './routes/schemeRoutes.js';
 import grievanceRoutes from './routes/grievanceRoutes.js';
 import citizenAuthRoutes from './routes/citizenAuthRoutes.js';
 import applicationRoutes from './routes/applicationRoutes.js';
+import householdRoutes from './routes/householdRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -64,6 +65,7 @@ app.use('/api/schemes', schemeRoutes);
 app.use('/api/grievances', grievanceRoutes);
 app.use('/api/citizens', citizenAuthRoutes);
 app.use('/api/applications', applicationRoutes);
+app.use('/api/households', householdRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
